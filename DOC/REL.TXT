@@ -1,0 +1,129 @@
+    4.3  FORMAT OF LINK COMPATIBLE OBJECT FILES
+
+
+				     NOTE
+
+		       Section	4.3   is   interesting
+		       material for users who wish  to
+		       know the load format of LINK-80
+		       relocatable object files.  Most
+		       users will want	to  skip  this
+		       section, as it does not contain
+		       material  neccessary   to   the
+		       operation of the package.
+
+
+    LINK-compatible object files consist of a bit stream. Individual fields
+    within the bit stream are not aligned on  byte  boundaries,  except  as
+    noted below. Use of a bit stream for relocatable object files keeps the
+    size of object files to a minimum, thereby	decreasing  the  number  of
+    disk reads/writes.
+
+    There are two basic types of load items: Absolute and Relocatable.	The
+    first bit of an item indicates one of these two types. If the first bit
+    is a 0, the following 8 bits are loaded as an  absolute  byte.  If	the
+    first bit is a 1, the next 2 bits are used	to  indicate  one  of  four
+    types of relocatable items:
+
+	 00	   Special LINK item (see below).
+
+	 01	   Program Relative. Load the following 16 bits
+		   after adding the current Program base.
+
+	 10	   Data Relative. Load the following 16 bits after
+		   adding the current Data base.
+
+	 11	   Common relative. Load the following 16 bits
+		   after adding the current Common base.
+
+    Special LINK items consist of the bit stream 100 followed by:
+
+		   a four-bit control field
+
+		   an optional A field consisting of a two-bit address type
+		   that is the same as the two-bit field  above  except  00
+		   specifies absolute address
+
+		   an optional B field consisting of 3	bits  that  give  a
+		   symbol length and up to 8 bits for each character of the
+		   symbol
+
+    A general representation of a special LINK item is:
+
+	 1 00 xxxx   yy  nn	zzz + characters of symbol name
+		    --------   ---------------------------------
+		    A field		  B field
+
+	 xxxx	   Fout-bit control field (0-15 below)
+	 yy	   Two-bit address type field
+	 nn	   Sixteen-bit value
+	 zzz	   Three-bit symbol length field
+
+    The following special types have a B-field only:
+
+	 0	   Entry symbol (name for search)
+	 1	   Select COMMON block
+	 2	   Program name
+	 3	   Request library search
+	 4	   Extension LINK items (see below)
+
+    The following special LINK items have both an A field and a B field:
+
+	 5	   Define COMMON size
+	 6	   Chain external (A is head of address chain, B is name of
+		   external symbol)
+	 7	   Define entry point (A is address, B is name)
+
+    The following special LINK items have an A field only:
+
+	 8	   External - offset. Used for JMP and CALL to externals
+	 9	   External + offset. The A value will be added to the	two
+		   bytes  starting  at	 the   current	 location   counter
+		   immediately before execution.
+	10	   Define size of Data area (A is size)
+	11	   Set loading location counter to A
+	12	   Chain address. A is head of chain, replace  all  entries
+		   in chain with current location counter. The	last  entry
+		   in the chain has an address field of absolute zero
+	13	   Define program size (A is size)
+	14	   End program (forces to byte boundary)
+
+    The following special LINK item has neither an A nor a B field:
+
+	15	   End file
+
+    An Extension LINK item follows the general	format	of  a  B-field-only
+    special LINK item, but contents of the B-field are not a  symbol  name.
+    Instead, the symbol area contains one character to identify the type of
+    Extension LINK item, followed by from 1 to 7 characters  of  additional
+    information.
+
+    Thus, every Extension LINK item has the format:
+
+	 1 00 0100 zzz i jjjjjjjj
+
+    where
+
+	 zzz	   may be any three bit integer (with 000 representing 8),
+
+	 i	   is an eight bit Extension LINK  item  type  indentifier,
+		   and
+
+	 jjjjjjjj  are zzz-1  eight  bit  character  of  information  whose
+		   significance depends on i
+
+    At present, there is only one Extension LINK item:
+
+	 i	   = X'35' COBOL overlay segment sentinel
+
+	 zzz	   = 010 (binary)
+
+	 j	   = COBOL segment number -49 (decimal)
+
+	 When the overlay segment sentinal is encountered  by  the  linker,
+	 the current overlay segment number is set to the value of j+49. If
+	 the previously existing segment  number  was  non-zero  and  a  /N
+	 switch is in effect, the data area is written to disk	in  a  file
+	 whose name is the current program name and whose extension is Vnn,
+	 where nn are the two hexadecimal digits  representing	the  number
+	 j+49 (decimal).

@@ -1,0 +1,437 @@
+######################################################################
+#
+#	Makefile for CLIB.IRL
+#
+######################################################################
+
+.SUFFIXES: .irl .asm .rel
+
+BIN	= z80emu
+AS	= $(BIN) as
+OL	= $(BIN) ol a
+
+
+
+OBJS	= startup sscanf fscanf scanf xxscn sprintf cprintf \
+	fprintf printf xfputc frmts intdos settime
+
+OBJS1	= setdate gettime getdate getdisk abswrit absread setdisk \
+	setarg diei inp outp root2 fread fwrite fgets
+
+OBJS2	= fgetc fputc fputs fputc1 ungetc fgetc1 cgets fclose \
+	fopen freopen fdopen fheap clearerr fsetpos gets
+
+OBJS3	= fgetpos fseek ftell fflush realloc calloc malloc free \
+	bsearch qsort strtol atoi div rand strtok
+
+OBJS4	= strstr strspn strupr strlwr strrchr strlen strpbrk \
+	strcspn inrange strchr strncmp strcmp strncat
+
+OBJS5	= strcat strncpy strcpy memcmp memmove memcpy memset \
+	movmem memchr rename getenv putenv sysenv ioctl
+
+OBJS6	= unlink mkdir rmdir isatty perror strerr chdir getcwd \
+	tell seek ltell lseek write read open
+
+OBJS7	= errno isprint isgraph isalpha ispunct iscntrl isspace \
+	isxdigit isalnum isascii islower isupper
+
+OBJS8	= isdigit toupper tolower xtcty kbhit gotoxy home \
+	clrscr cputs getche getch putch setjmp sleep
+
+OBJS9	= sbrk puts bdos cpshd srab srihb srnhb slab slhb \
+	dvbab dvihd min max abs dvnhd mulab
+
+OBJS10	= mulhd sauhl lauhl ffirst fnext hex32 hex16 hex8 \
+	msinit msshow mshide dec8 dec16 dec32
+
+OBJS11	= msstat msgstat msspos mssgpos msybnd msxbnd msscur \
+	mstcur msgcur msgsens mssens mshard msvmode msref
+
+clib.irl: startup.rel sscanf.rel fscanf.rel scanf.rel xxscn.rel sprintf.rel \
+  cprintf.rel fprintf.rel printf.rel xfputc.rel frmts.rel intdos.rel \
+  settime.rel setdate.rel gettime.rel getdate.rel getdisk.rel \
+  abswrit.rel absread.rel setdisk.rel setarg.rel diei.rel inp.rel \
+  outp.rel root2.rel fread.rel fwrite.rel fgets.rel fgetc.rel fputc.rel \
+  fputs.rel fputc1.rel ungetc.rel fgetc1.rel gets.rel fclose.rel \
+  fopen.rel freopen.rel fdopen.rel fheap.rel clearerr.rel fsetpos.rel \
+  fgetpos.rel fseek.rel ftell.rel fflush.rel realloc.rel calloc.rel \
+  malloc.rel free.rel bsearch.rel qsort.rel strtol.rel atoi.rel div.rel \
+  rand.rel strtok.rel strstr.rel strspn.rel strupr.rel strlwr.rel \
+  strrchr.rel strlen.rel strpbrk.rel strcspn.rel inrange.rel strchr.rel \
+  strncmp.rel strcmp.rel strncat.rel strcat.rel strncpy.rel strcpy.rel \
+  memcmp.rel memmove.rel memcpy.rel memset.rel movmem.rel memchr.rel \
+  rename.rel getenv.rel putenv.rel sysenv.rel ioctl.rel unlink.rel \
+  mkdir.rel rmdir.rel isatty.rel perror.rel strerr.rel chdir.rel \
+  getcwd.rel tell.rel seek.rel ltell.rel lseek.rel write.rel read.rel \
+  open.rel errno.rel isprint.rel isgraph.rel isalpha.rel ispunct.rel \
+  iscntrl.rel isspace.rel isxdigit.rel isalnum.rel isascii.rel \
+  islower.rel isupper.rel isdigit.rel toupper.rel tolower.rel xtcty.rel \
+  kbhit.rel cgets.rel gotoxy.rel home.rel clrscr.rel cputs.rel \
+  getche.rel getch.rel putch.rel setjmp.rel sleep.rel sbrk.rel puts.rel \
+  bdos.rel cpshd.rel srab.rel srihb.rel srnhb.rel slab.rel slhb.rel \
+  dvbab.rel dvihd.rel min.rel max.rel abs.rel dvnhd.rel mulab.rel \
+  mulhd.rel sauhl.rel lauhl.rel ffirst.rel fnext.rel msinit.rel \
+  msshow.rel mshide.rel msstat.rel msgstat.rel msspos.rel mssgpos.rel \
+  msybnd.rel msxbnd.rel msscur.rel mstcur.rel msgcur.rel msgsens.rel \
+  mssens.rel mshard.rel msvmode.rel msref.rel \
+  hex32.rel hex16.rel hex8.rel dec8.rel dec16.rel dec32.rel
+
+	$(OL) CLIB.IRL $(OBJS)
+	$(OL) CLIB.IRL $(OBJS1)
+	$(OL) CLIB.IRL $(OBJS2)
+	$(OL) CLIB.IRL $(OBJS3)
+	$(OL) CLIB.IRL $(OBJS4)
+	$(OL) CLIB.IRL $(OBJS5)
+	$(OL) CLIB.IRL $(OBJS6)
+	$(OL) CLIB.IRL $(OBJS7)
+	$(OL) CLIB.IRL $(OBJS8)
+	$(OL) CLIB.IRL $(OBJS9)
+	$(OL) CLIB.IRL $(OBJS10)
+	$(OL) CLIB.IRL $(OBJS11)
+
+startup.rel: startup.asm
+	$(AS) $*.asm
+sscanf.rel: sscanf.asm
+	$(AS) $*.asm
+fscanf.rel: fscanf.asm
+	$(AS) $*.asm
+scanf.rel: scanf.asm
+	$(AS) $*.asm
+xxscn.rel: xxscn.asm
+	$(AS) $*.asm
+sprintf.rel: sprintf.asm
+	$(AS) $*.asm
+cprintf.rel: cprintf.asm
+	$(AS) $*.asm
+fprintf.rel: fprintf.asm
+	$(AS) $*.asm
+printf.rel: printf.asm
+	$(AS) $*.asm
+xfputc.rel: xfputc.asm
+	$(AS) $*.asm
+frmts.rel: frmts.asm
+	$(AS) $*.asm
+intdos.rel: intdos.asm
+	$(AS) $*.asm
+settime.rel: settime.asm
+	$(AS) $*.asm
+setdate.rel: setdate.asm
+	$(AS) $*.asm
+gettime.rel: gettime.asm
+	$(AS) $*.asm
+getdate.rel: getdate.asm
+	$(AS) $*.asm
+getdisk.rel: getdisk.asm
+	$(AS) $*.asm
+abswrit.rel: abswrit.asm
+	$(AS) $*.asm
+absread.rel: absread.asm
+	$(AS) $*.asm
+setdisk.rel: setdisk.asm
+	$(AS) $*.asm
+setarg.rel: setarg.asm
+	$(AS) $*.asm
+diei.rel: diei.asm
+	$(AS) $*.asm
+inp.rel: inp.asm
+	$(AS) $*.asm
+outp.rel: outp.asm
+	$(AS) $*.asm
+root2.rel: root2.asm
+	$(AS) $*.asm
+fread.rel: fread.asm
+	$(AS) $*.asm
+fwrite.rel: fwrite.asm
+	$(AS) $*.asm
+fgets.rel: fgets.asm
+	$(AS) $*.asm
+fgetc.rel: fgetc.asm
+	$(AS) $*.asm
+fputc.rel: fputc.asm
+	$(AS) $*.asm
+fputs.rel: fputs.asm
+	$(AS) $*.asm
+fputc1.rel: fputc1.asm
+	$(AS) $*.asm
+ungetc.rel: ungetc.asm
+	$(AS) $*.asm
+fgetc1.rel: fgetc1.asm
+	$(AS) $*.asm
+gets.rel: gets.asm
+	$(AS) $*.asm
+fclose.rel: fclose.asm
+	$(AS) $*.asm
+fopen.rel: fopen.asm
+	$(AS) $*.asm
+freopen.rel: freopen.asm
+	$(AS) $*.asm
+fdopen.rel: fdopen.asm
+	$(AS) $*.asm
+fheap.rel: fheap.asm
+	$(AS) $*.asm
+clearerr.rel: clearerr.asm
+	$(AS) $*.asm
+fsetpos.rel: fsetpos.asm
+	$(AS) $*.asm
+fgetpos.rel: fgetpos.asm
+	$(AS) $*.asm
+fseek.rel: fseek.asm
+	$(AS) $*.asm
+ftell.rel: ftell.asm
+	$(AS) $*.asm
+fflush.rel: fflush.asm
+	$(AS) $*.asm
+realloc.rel: realloc.asm
+	$(AS) $*.asm
+calloc.rel: calloc.asm
+	$(AS) $*.asm
+malloc.rel: malloc.asm
+	$(AS) $*.asm
+free.rel: free.asm
+	$(AS) $*.asm
+bsearch.rel: bsearch.asm
+	$(AS) $*.asm
+qsort.rel: qsort.asm
+	$(AS) $*.asm
+strtol.rel: strtol.asm
+	$(AS) $*.asm
+atoi.rel: atoi.asm
+	$(AS) $*.asm
+div.rel: div.asm
+	$(AS) $*.asm
+rand.rel: rand.asm
+	$(AS) $*.asm
+strtok.rel: strtok.asm
+	$(AS) $*.asm
+strstr.rel: strstr.asm
+	$(AS) $*.asm
+strspn.rel: strspn.asm
+	$(AS) $*.asm
+strupr.rel: strupr.asm
+	$(AS) $*.asm
+strlwr.rel: strlwr.asm
+	$(AS) $*.asm
+strrchr.rel: strrchr.asm
+	$(AS) $*.asm
+strlen.rel: strlen.asm
+	$(AS) $*.asm
+strpbrk.rel: strpbrk.asm
+	$(AS) $*.asm
+strcspn.rel: strcspn.asm
+	$(AS) $*.asm
+inrange.rel: inrange.asm
+	$(AS) $*.asm
+strchr.rel: strchr.asm
+	$(AS) $*.asm
+strncmp.rel: strncmp.asm
+	$(AS) $*.asm
+strcmp.rel: strcmp.asm
+	$(AS) $*.asm
+strncat.rel: strncat.asm
+	$(AS) $*.asm
+strcat.rel: strcat.asm
+	$(AS) $*.asm
+strncpy.rel: strncpy.asm
+	$(AS) $*.asm
+strcpy.rel: strcpy.asm
+	$(AS) $*.asm
+memcmp.rel: memcmp.asm
+	$(AS) $*.asm
+memmove.rel: memmove.asm
+	$(AS) $*.asm
+memcpy.rel: memcpy.asm
+	$(AS) $*.asm
+memset.rel: memset.asm
+	$(AS) $*.asm
+movmem.rel: movmem.asm
+	$(AS) $*.asm
+memchr.rel: memchr.asm
+	$(AS) $*.asm
+rename.rel: rename.asm
+	$(AS) $*.asm
+getenv.rel: getenv.asm
+	$(AS) $*.asm
+putenv.rel: putenv.asm
+	$(AS) $*.asm
+sysenv.rel: sysenv.asm
+	$(AS) $*.asm
+ioctl.rel: ioctl.asm
+	$(AS) $*.asm
+unlink.rel: unlink.asm
+	$(AS) $*.asm
+mkdir.rel: mkdir.asm
+	$(AS) $*.asm
+rmdir.rel: rmdir.asm
+	$(AS) $*.asm
+isatty.rel: isatty.asm
+	$(AS) $*.asm
+perror.rel: perror.asm
+	$(AS) $*.asm
+strerr.rel: strerr.asm
+	$(AS) $*.asm
+chdir.rel: chdir.asm
+	$(AS) $*.asm
+getcwd.rel: getcwd.asm
+	$(AS) $*.asm
+tell.rel: tell.asm
+	$(AS) $*.asm
+seek.rel: seek.asm
+	$(AS) $*.asm
+ltell.rel: ltell.asm
+	$(AS) $*.asm
+lseek.rel: lseek.asm
+	$(AS) $*.asm
+write.rel: write.asm
+	$(AS) $*.asm
+read.rel: read.asm
+	$(AS) $*.asm
+open.rel: open.asm
+	$(AS) $*.asm
+errno.rel: errno.asm
+	$(AS) $*.asm
+isprint.rel: isprint.asm
+	$(AS) $*.asm
+isgraph.rel: isgraph.asm
+	$(AS) $*.asm
+isalpha.rel: isalpha.asm
+	$(AS) $*.asm
+ispunct.rel: ispunct.asm
+	$(AS) $*.asm
+iscntrl.rel: iscntrl.asm
+	$(AS) $*.asm
+isspace.rel: isspace.asm
+	$(AS) $*.asm
+isxdigit.rel: isxdigit.asm
+	$(AS) $*.asm
+isalnum.rel: isalnum.asm
+	$(AS) $*.asm
+isascii.rel: isascii.asm
+	$(AS) $*.asm
+islower.rel: islower.asm
+	$(AS) $*.asm
+isupper.rel: isupper.asm
+	$(AS) $*.asm
+isdigit.rel: isdigit.asm
+	$(AS) $*.asm
+toupper.rel: toupper.asm
+	$(AS) $*.asm
+tolower.rel: tolower.asm
+	$(AS) $*.asm
+xtcty.rel: xtcty.asm
+	$(AS) $*.asm
+kbhit.rel: kbhit.asm
+	$(AS) $*.asm
+cgets.rel: cgets.asm
+	$(AS) $*.asm
+gotoxy.rel: gotoxy.asm
+	$(AS) $*.asm
+home.rel: home.asm
+	$(AS) $*.asm
+clrscr.rel: clrscr.asm
+	$(AS) $*.asm
+cputs.rel: cputs.asm
+	$(AS) $*.asm
+getche.rel: getche.asm
+	$(AS) $*.asm
+getch.rel: getch.asm
+	$(AS) $*.asm
+putch.rel: putch.asm
+	$(AS) $*.asm
+setjmp.rel: setjmp.asm
+	$(AS) $*.asm
+sleep.rel: sleep.asm
+	$(AS) $*.asm
+sbrk.rel: sbrk.asm
+	$(AS) $*.asm
+puts.rel: puts.asm
+	$(AS) $*.asm
+bdos.rel: bdos.asm
+	$(AS) $*.asm
+cpshd.rel: cpshd.asm
+	$(AS) $*.asm
+srab.rel: srab.asm
+	$(AS) $*.asm
+srihb.rel: srihb.asm
+	$(AS) $*.asm
+srnhb.rel: srnhb.asm
+	$(AS) $*.asm
+slab.rel: slab.asm
+	$(AS) $*.asm
+slhb.rel: slhb.asm
+	$(AS) $*.asm
+dvbab.rel: dvbab.asm
+	$(AS) $*.asm
+dvihd.rel: dvihd.asm
+	$(AS) $*.asm
+min.rel: min.asm
+	$(AS) $*.asm
+max.rel: max.asm
+	$(AS) $*.asm
+abs.rel: abs.asm
+	$(AS) $*.asm
+dvnhd.rel: dvnhd.asm
+	$(AS) $*.asm
+mulab.rel: mulab.asm
+	$(AS) $*.asm
+mulhd.rel: mulhd.asm
+	$(AS) $*.asm
+sauhl.rel: sauhl.asm
+	$(AS) $*.asm
+lauhl.rel: lauhl.asm
+	$(AS) $*.asm
+ffirst.rel: ffirst.asm
+	$(AS) $*.asm
+fnext.rel: fnext.asm
+	$(AS) $*.asm
+msinit.rel: msinit.asm
+	$(AS) $*.asm
+msshow.rel: msshow.asm
+	$(AS) $*.asm
+mshide.rel: mshide.asm
+	$(AS) $*.asm
+msstat.rel: msstat.asm
+	$(AS) $*.asm
+msgstat.rel: msgstat.asm
+	$(AS) $*.asm
+msspos.rel: msspos.asm
+	$(AS) $*.asm
+mssgpos.rel: mssgpos.asm
+	$(AS) $*.asm
+msybnd.rel: msybnd.asm
+	$(AS) $*.asm
+msxbnd.rel: msxbnd.asm
+	$(AS) $*.asm
+msscur.rel: msscur.asm
+	$(AS) $*.asm
+mstcur.rel: mstcur.asm
+	$(AS) $*.asm
+msgcur.rel: msgcur.asm
+	$(AS) $*.asm
+msgsens.rel: msgsens.asm
+	$(AS) $*.asm
+mssens.rel: mssens.asm
+	$(AS) $*.asm
+mshard.rel: mshard.asm
+	$(AS) $*.asm
+msvmode.rel: msvmode.asm
+	$(AS) $*.asm
+msref.rel: msref.asm
+	$(AS) $*.asm
+hex8.rel: hex8.asm
+	$(AS) $*.asm
+hex16.rel: hex16.asm
+	$(AS) $*.asm
+hex32.rel: hex32.asm
+	$(AS) $*.asm
+dec8.rel: dec8.asm
+	$(AS) $*.asm
+dec16.rel: dec16.asm
+	$(AS) $*.asm
+dec32.rel: dec32.asm
+	$(AS) $*.asm
+
+
+#
+clean:
+	del clib.irl
