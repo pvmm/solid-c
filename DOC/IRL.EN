@@ -1,0 +1,79 @@
+Last Update: 7.05.2004
+
+
+                         IRL Format
+                         ~~~~~~~~~~
+
+  IRL-file represents a collection of compiled REL-files. Organization of
+compilation is optimized for work with libraries. At the beginning of IRL-file there are 3 bytes:
+
+	db	high byte		;+0  (File offset >> 14) & 0x7F
+	db	middle byte		;+1  (File offset >>  7) & 0x7F
+	db	low byte		;+2  (File offset     1) & 0x7F
+
+IRL-file consists of 3 sections: IRL-directory, symbol table, and REL-section.
+
+
+ IRL-Directory
+ ~~~~~~~~~~~~~
+Array of 128 bytes at the beginning of REL-file. Used only first bytes which
+contain offsets to REL-sections. Remaining bytes are set to zero:
+
+	db	high,middle,0  ; Offset to REL-section. The low byte
+			   ; is always equal to 0. Beginning of REL-section is
+                           ; aligned on boundary of 128 bytes.
+	ds	125	       ; Not used and set to 0.
+
+To calculate the offset to REL-section, the bytes "high" and "middle" are
+multiplied by 128. For example for file clib.irl: 0011h * 128 = 0880h
+
+	ld	h,xx		;+0
+	ld	a,xx		;+1
+	;a,h,l * 128
+	add	a,a
+	ld	l,a
+	xor	a
+	srl	h
+	rr	l
+	srl	h
+	rr	l
+	rra
+	;hl=high byte result
+	;a=low byte result
+
+Important note, that the 7th bit of the first byte is always 0. In the compiled
+rel-files, the 7th bit of the first byte is always 1 (reason for flag "end of record").
+
+
+ Symbol Table
+ ~~~~~~~~~~~~
+Symbols begin at offset +80h from the beginning of file and consists of quantity
+of symbol table entries of different sizes. Each entry has the format:
+
+	db	high,middle,low	; Offset to beginning of rel-section in rel-file,
+				; containing symbol string (name).
+	db	"SYMBOL"	; Symbol string of 1..8 characters.
+	db	0FEh		; End of string.
+
+
+End of symbol table is marked with 0 at the beginning of symbol string:
+
+	db	high,middle,0	; End of REL-section. Not offset to
+				; file and REL-section, but the number of
+				; REL-sections that are aligned on boundary
+				; of 128 bytes.
+	db	0FEh		; End of string.
+
+ NOTE!: In irl-files from the "OL" linker, each entry has the format:
+
+	db	0,0,0
+	db	0FFh
+
+After this entry, the table is aligned (LIB uses byte 1Ah) to next
+boundary of 128 bytes.
+
+
+ REL-Section
+ ~~~~~~~~~~~
+REL-section always begins on boundary of 128 bytes. Consists of sequence of rel-
+records. To convert IRL-library to REL-library, you must remove headers and symbol table.

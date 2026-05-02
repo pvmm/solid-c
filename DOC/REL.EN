@@ -1,0 +1,137 @@
+Last Update: 7.05.2004
+
+
+                REL-Format Description of Object Files
+
+
+  Object files in REL-format are based on Microsoft, represented as a sequence of control
+records. Each record in the control record is organized on boundary lines,
+except for data records, designated differently.
+  The use of control records for object files allows to reduce the size,
+and due to the small number of records for reading/writing operations.
+
+  Records have two main types: absolute and relocatable. The type is determined by
+two least significant bits. If it is equal to 0, the next 8 bits contain the
+data of the data record. If the lowest two bits equal 1, the next 2 bits determine 4 types:
+
+     00b       Absolute data (designation designation).
+
+     01b       Relocatable code. The value of the following 16 bits (2 bytes)
+               should be added to the current value of the code segment
+               offset.
+
+     10b       Relocatable data. The value of the following 16 bits (2 bytes)
+               should be added to the current value of the data segment
+               offset.
+
+     11b       Relocatable Common segment (code+data). The value of the following
+               16 bits (2 bytes) should be added to the current value
+               of the Common segment offset.
+
+
+Absolute data record(s) contain:
+
+    In bits. First 4 bits are bits 0..15.
+
+    In the respective A-field. Contains 2 bits of type designation cseg,
+      dseg, common (except absolute) and 2 (4 in extended REL) bits
+      of the value.
+
+    In the respective B-field. Contains 3 bits (5 in extended REL)
+      the name of the identifier and the same identifier designation.
+
+
+General specification of spec-records:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    1 00b   xxx   yy  nnnn  mmmm    zzz + identifier designation
+                  --------------    ------------------------
+                      A-field                B-field
+
+      xxx     4 bits identifier. Type (0..15 different records, see below)
+
+      yy      2 bits of type designation (cseg/dseg/common)
+      nnnn    16 bits value (count)
+      mmmm    16 bits respectively, for extended REL-format
+
+      zzz     3 bits identifier field (5 bits for extended. REL-format)
+      ...     for identifier designation
+
+
+List of identifiers of control record
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Identifiers only in B-field:
+
+     0      -  for record, for which next reference
+     1      -  for COMMON name
+     2      -  for program. Name (program name)
+     3      -  request-library file (request library search)
+     4      -  external identifier designation. See note.
+
+Identifiers in A-field and B-field:
+
+     5      -  COMMON size (applicable only for A-field ?)
+     6      -  identifier chain:
+                 for A-field: number of entries in chain
+                 for B-field: number of chain
+     7      -  record entry point:
+                 for A-field: number of accessible. record
+                 for B-field: name of record
+
+Identifiers only in A-field:
+
+     8      -  External - offset. Used for JMP and CALL to externals.
+     9      -  External + offset. The A value will be added to the two
+               bytes starting at the current location counter immediately
+               before execution.
+    10      -  size of external segment.
+    11      -  location counter of segment (ORG cseg/dseg/common).
+    12      -  chain entry. A is head of chain, replace all entries
+               in chain with current location counter.
+               End of chain is indicated by zero entry.
+    13      -  size of external name.
+    14      -  end of program name (end program), after which
+               control is returned to the caller.
+
+When the record is not in the A-field, it is in the B-field:
+
+    15      -  end of file
+
+
+Note on external identifier:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C-form represents external identifier using B-field spec-record, but which
+must contain the identifier designation as well as in the B-field. After that
+the next identifier name, which may have a type (signature) external identifier, after
+which 1 to 7 bits of additional information are placed respectively.
+
+In other words, the record containing external identifier has the format:
+
+   1 00b  0100b   zzz  i  jjjjjjjj
+                  ----------------
+                      C-field
+
+     zzz        first 3 bits (000b represents an 8).
+                (001b in SOLID version).
+
+     i          8 bits of type (signature) of external identifier.
+                (0FEh in SOLID version).
+
+     jjjjjjjj   zzz-1 number of bits of information. Values are received
+                by type i.
+
+
+For compatibility only with COBOL external identifier:
+
+     zzz        010b (2)
+
+     i          X'35' type (signature) of COBOL segment
+
+     j          number of COBOL segment - 31h  (standard format specification)
+
+  After this, the signature of the COBOL segment follows, the current number
+of required segments set to the value j+31h (standard format specification).
+If the required COBOL segment number is not yet received in the record
+for file output with option /N (list. file with mapping), then the record output
+to file. This file is equal to the current name of the program, and the extension of the file is
+Vxx, where "xx" is the hex-number of the COBOL segment j+31h (standard format specification).

@@ -1,0 +1,227 @@
+                       Library Development
+
+
+   Libraries are a way to create libraries. This document is described in the following
+paragraphs. Unlike method "a" - method and library are not used, methods
+in collected user programs subsequently are performed with that later and such
+functions which are not directly used.
+  Unlike the first, method "b" provides words and requires entire content,
+but arranged in accordance with user programs and can include and so only such
+functions which were previously used in the program.
+Standard library "clib.irl" is created using method "b".
+
+
+               1. Complete Method of Library Creation
+
+Consider example of two functions "power" and "log2":
+
+int power(x,e)
+int x,e;
+{
+     int y;
+     for(y=1; e>0; e--)
+           y *= x;
+     return(y);
+}
+
+int log2(x)
+int x;
+{
+     int y;
+     for(y=0; x>1; x>>=1)
+           y++;
+     return(y);
+}
+
+   If these functions are contained in a file named XLIB.C, the subsequent
+creation of library is performed as follows:
+
+        cc1 xlib
+        cc2 xlib
+        as xlib
+
+   After execution of this sequence will be created a library with
+name XLIB.REL. This representation can be used in assembly of programs, which calls functions
+from this library:
+
+        ld prog,xlib,clib/l/gXMAIN
+
+   In this case, the required option /l after the name of library XLIB,
+i.e., even if everything is there, then all functions that are contained in library
+XLIB, will be linked with the program "prog".
+
+   The next method will be described as the method of inclusion in the library of programs, written
+in assembly. The following example describes methods of creation of both
+examples. Then the method of creating a library in the program, described
+in assembly. In the following examples below, the functions hex, ror and rol, contained
+in file ALIB.ASM:
+
+        public hex_, ror_, rol_
+        cseg
+hex_:                     ; convert 0..F -> '0'..'F'
+        and     0Fh
+        add     a,90h
+        daa
+        adc     a,40h
+        daa
+        ret
+
+ror_:                     ; ror(c,n) n bit rotate right char
+        inc     e
+rorl:   dec     e
+        ret     z
+        rrca
+        jp      rorl
+
+rol_:                     ; rol(c,n) n bit rotate left char
+        inc     e
+roll:   dec     e
+        ret     z
+        rlca
+        jp      roll
+
+   Storage of these functions in the library is performed by executing the following
+sequence:
+
+        as alib.asm
+
+Following assembly, linking of the program, as well as in the case of C-program:
+
+        ld prog,alib,clib/l/gXMAIN
+
+   Like these are two approaches, the most complete method of creating a library - storage and assembly as a program, to which linking is a program.
+Each of these methods has advantages, as they call the entire library.
+The next paragraph will describe the method of creating a library, as separated
+program libraries are separated only for these functions, with which the program is connected.
+
+
+                  2. Modular Library Creation
+
+              2.1. Placement of C-Program in Library
+
+   The following will explain for the example, which we already have - placement of file XLIB.C,
+containing the text of functions POWER and LOG2 in a library.
+   First, we need to "separate" file XLIB.C on storing these functions, distributing
+them in separate files POWER.C and LOG2.C. Then we need to execute the following
+commands:
+
+        cc1 power
+	cc1 log2
+	cc2 power
+	cc2 log2
+	as power
+	as log2
+	ol a xlib.irl power log2
+
+After execution of this sequence, the following occurs:
+
+   1. C-text of functions is transferred to assembly code.
+   2. As a result of assembling, object modules with extension ".rel" are created.
+   3. Using the OL linker, all modules with extension ".rel"
+      create the library XLIB.IRL.
+
+After creation of library XLIB.IRL, files POWER.REL and LOG2.REL no longer need
+to be stored and can be deleted.
+Use of library XLIB.IRL is determined by the following command:
+
+        ld prog,xlib/l,clib/l/gXMAIN
+
+   After the library XLIB is transferred with the /l option, to indicate optimal
+inclusion of the program only the necessary functions.
+
+   When collecting a program, consisting of a large number of files (functions), only
+those objects from which functions are required will be used. These are two examples:
+one incorrect, and the other correct.
+
+   Correct example:
+
+char islower(c)
+char c;
+{
+   return('a'<=c && c<='z');
+}
+
+char toupper(c)
+char c;
+{
+   return(islower(c) ? c-'a'-'A' : c);
+}
+
+   In this example in the library contains file X.C, containing both
+functions. In this case the function "islower" is used in file X.REL in
+function "toupper". Therefore, when connecting them, the whole /l option
+will not remove diagnostics of error type missing reference.
+
+  But if initially the text of function "toupper", following incorrect
+example:
+
+char toupper(c)
+char c;
+{
+   char islower();
+   return(islower(c) ? c-'a'-'A' : c);
+}
+
+char islower(c)
+char c;
+{
+   return('a'<=c && c<='z');
+}
+
+   As a result of using modules in separately compiled files, there will be an error.
+To avoid this situation, always remember that with correct organization
+use of libraries in the source program, you must first list the functions
+that are called, and then those that call them.
+
+
+            2.2. Modular Library from Assembly
+
+   In contrast to the described placement in a library, which was discussed in section 2.1,
+simply, file ALIB.ASM should be separately separated into the following three files
+"hex.asm", "ror.asm" and "rol.asm":
+
+HEX.ASM:
+        cseg
+
+hex_::  and     0Fh
+        add     a,90h
+        daa
+        adc     a,40h
+        daa
+        ret
+
+
+ROR.ASM:
+        cseg
+
+ror_::  inc     e
+rorl:   dec     e
+        ret     z
+        rrca
+        jp      rorl
+
+
+ROL.ASM:
+        cseg
+
+rol_::  inc     e
+roll:   dec     e
+        ret     z
+        rlca
+        jp      roll
+
+   After that, each one will be assembled and creates a file with extension
+".rel", then using the OL linker to create a library:
+
+        as hex
+        as ror
+        as rol
+        ol a alib.irl hex ror rol
+
+Use of library ALIB.IRL is determined by the following command:
+
+        ld prog,alib/l,clib/l/gXMAIN
+
+   When collecting a program, exactly the same as described, as in library assembly of C-program
+from modules, the sequence execution of source text is important, and specifically:
+calling functions should be before those, and calling them, after.

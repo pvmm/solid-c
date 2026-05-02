@@ -1,0 +1,119 @@
+                    Development Guide for Programs
+
+
+   When developing a large program, source text is divided into several files.
+After that, when each one is compiled separately, you need to combine them to create
+a complete program. This document describes the method of separate compilation and notes
+the basic principles on which you should rely when developing source
+text.
+
+
+                  1. Notes on Source Programs
+
+   The following example shows typical problems of separate compilation and assembly of
+programs:
+
+        - references to functions in other files
+        - external variable definitions between files
+
+Both of these cases are described below with practical examples. Look at the following program.
+
+#include <stdio.h>
+int  a[10];
+char b[4];
+
+char main()
+{
+        char sub1(),sub2();
+        sub1();
+        sub2();
+        printf("%d,%d,%d\n",a[0],a[3],a[9]);
+        printf("%c,%c,%c\n",b[0],b[1],b[2]);
+}
+
+char sub1()
+{
+        a[0]=1;
+        a[3]=2;
+        a[9]=3;
+}
+
+char sub2()
+{
+        b[0]='a';
+        b[1]='b';
+        b[2]='c';
+}
+
+   Suppose the source program is divided into three files called PROG1, PROG2 and
+PROG3 - which contain the main function and functions 1 and 2, respectively.
+Specifically, in each of these files should contain:
+
+PROG1.C:
+        #include <stdio.h>
+        int a[10];
+        char b[4];
+        char main()
+        {
+              :
+              :
+        }
+
+PROG2.C:
+        extern int a[10];
+        char sub1()
+        {
+              :
+              :
+        }
+
+PROG3.C:
+        extern char b[4];
+        char sub2()
+        {
+              :
+              :
+        }
+
+   The main function calls functions sub1 and sub2, therefore they are declared
+externally. For functions sub1 and sub2, in their own scope, other functions are
+not called - declaring other functions is not required. The use of arrays "a"
+and "b" also causes problems. The identifier "a" is used in the program main
+and sub1. The array "b" is used in functions main and sub2. In all these cases,
+in each file should be set appropriately.
+   For this purpose, the keyword "extern" (external) is used. In the first of the files
+- PROG1.C, where the keyword is declared, arrays are in this file. This fact is
+indicated by the responsibility that arrays "a" and "b" are contained in file PROG1.C, and in other
+files there are no arrays. If in any other later file you want to define these external
+variables "extern", then the assembly of the entire program will result in errors about
+duplicate arrays. On the other hand, if you forget to declare the keyword "extern" for some
+external variable, then it will be created for this variable.
+   Therefore, in the case of organizing many files in a large program, you must
+declare all external variables "extern" only in one of the files
+and text of the source program. For all other files you must place "extern".
+
+
+              2. Procedure of Compilation and Assembly of Programs
+
+   When developing text files of source programs, the subsequent
+sequence of compilation and assembly of modules should be executed as follows:
+
+        cc1 prog1
+        cc1 prog2
+        cc1 prog3
+        cc2 prog1
+        cc2 prog2
+        cc2 prog3
+        as prog1
+        as prog2
+        as prog3
+        ld prog=prog1,prog2,prog3,clib/l/gXMAIN
+
+   In the case where any part of the program (any file) has already been compiled and
+requires only time to be recompiled (for example, file PROG2.C), then
+execute the corresponding group of commands:
+
+        cc1 prog2
+        cc2 prog2
+        as prog2
+        ld prog=prog1,prog2,prog3,clib/l/gXMAIN

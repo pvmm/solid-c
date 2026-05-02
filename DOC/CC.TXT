@@ -1,0 +1,929 @@
+               Reference Manual for C in the ESTEX System
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+                            Introduction
+
+   Throughout the entire development of the optimized SOLID C compiler, the goal was to create
+comprehensive documentation that would describe its work in the system itself and programming
+assistance for it. To achieve this goal, a detailed description of individual tools was created. Thus, when
+developing a tool for automatic register allocation, it was possible to remove from the code
+effectively unneeded object code. As a result, the code remained on a high-level language (similar to
+ESTEX itself) with a system that works under strict restrictions on memory and real-time constraints. At the same
+time, it was necessary to preserve the required programming for all assemblies.
+
+   The main goal of this documentation - to help the user understand and apply this compiler in the framework of the ESTEX
+operating system and to develop proper use of this compiler.
+
+   SOLID C can be represented as a two-stage compiler language, transforming source C-text and
+programs into assembly language. The compiler consists of two files "cc1.exe" and "cc2.exe", which
+perform the corresponding stages and phases of transformation.
+   In the first phase, the input C-text is transformed into an intermediate form (C-form),
+stored in a file with the extension ".tmc" (by convention). In the first phase,
+such diagnostics of errors are provided and formatted messages are output.
+   In the second phase, the intermediate C-form is transformed into assembly code,
+stored in a file with the extension ".asm" (by convention).
+   It should be noted that for a significant number of constructs, the optimization is performed quite well, but the time spent
+on the optimization by the C-program is 2 to several times longer compared to non-optimized (non-optimized) C-compilers.
+
+
+                     Description of Compiler Stages
+
+   The first stage (cc1.exe) performs the first phase of compilation. It reads
+the source C-text, checks it for correctness of syntax and semantics. As a result of the first stage, an intermediate
+file with C-form is created, i.e., C-text. The standard extension of this file, containing
+C-form, is ".tmc".
+   The command line for the first stage has the following format:
+
+       CC1 [options] source_file
+
+   The source file may contain uppercase letters and numbers, and the maximum length
+of the line must not exceed 80 characters. Typically, the source C-file uses the extension ".c". If the extension
+of the source file is ".c", then you do not need to specify it.
+
+                  Options for Compiling Object Code
+
+ -c       Unlike the standard CC mode, the SOLID C compiler
+          processes static (declared) identifiers.
+          This option enables the static identifier processing mode.
+
+ -dNAME   Define a preprocessor constant in the form "NAME". The option value can be
+          "NAME" may not be checked.
+
+ -e       Enable preprocessing, output messages to error file with extension
+          ".err". This is created always from the current name of the source
+          ".c" file.
+
+ -jN      Set the maximum number of error messages for compilation. Compilation is
+          aborted if the number of errors equals or exceeds "N". The option value
+          with the number "N" may not be checked. Example: -j30 (abort compilation
+          after 30 errors).
+
+ -k       Enable compatibility mode with the standard CC language (K&R standard).
+          It allows you to use the old form of function parameters.
+          This option must be used when compiling "old" source code.
+
+ -m       Enable output of diagnostic information in table form.
+
+ -oNAME   Specify the name for the output file in C-form. The maximum length
+          of the path (folder\subfolder\file) must be no more than
+          80 characters. The option value with the string "NAME" may not be checked.
+
+ -rP:S:H  Set the relative sizes of parts of the working symbol table:
+          P - pool, S - symbol table, H - hash-table.
+          By default, the ratio 13:6:4 is used. If there is overflow
+          of any part of the table, use it for another
+          appropriate ratio of the sizes of the working parts of the table.
+          The option value with the string "P:S:H" may not be checked.
+
+ -x       Enable extended compatibility with MSX-C compiler. At the same time,
+          the extension of the C-form file is changed from ".tmc" to ".tco".
+
+
+                           Assembler
+
+   The assembler (cc2.exe) performs the second phase of compilation. It reads
+a file in C-form and creates the output file in assembly language.
+   The command line for the second phase has the following format:
+
+        CC2 [options] source_file
+
+If the extension of the source file in C-form is not specified, then the
+standard extension ".tmc" is used. If the extension is not specified for the output
+file - the extension ".asm" is used. The maximum length of the string
+"folder\subfolder\source_file" should be no more than 64 characters.
+If you want to use a file for output that does not exist, then by default
+it will be created in the current directory of the source C-form file.
+
+                       Assembler Options
+
+ -k      Do not delete the source C-form file (.tmc) after successful completion
+         of the assembly.
+
+ -oNAME  Specify the name for the output asm-file. The maximum length
+         of the path (folder\subfolder\file) should not exceed
+         64 characters. The option value with the string "NAME" may not be checked.
+
+ -rN     Reserve memory for the symbol table of the compilation with a size
+         of N bytes (N - decimal format). The option value with the number "N"
+         may not be checked. Example: -r2000 (reserve symbol table with 2000 bytes).
+
+ -uX     Define a prefix-character "X" for labels in asm-code. By default,
+         the character "_" is used. Example: -u@  (use the prefix-character
+         "@" for labels in the output asm-code).
+
+ -q      "Quiet" mode. The compiler suppresses output of "---" and "+++"
+         messages to the screen during execution.
+
+
+
+
+              Compatibility of SOLID C Compiler for the ESTEX System
+
+
+   It was said earlier that the entire development of the new C-compiler was carried out
+for compatibility, and therefore the entire approach was to (identical assembly-level language scheme)
+develop programs that allow the use of strict requirements of real-time and memory constraints. In terms of
+compatibility with the standard, exceptional attention was paid to this issue. Moreover, there should be
+clarification of the programming in SOLID C.
+
+   The SOLID C compiler can work in three different modes. First, one can "comply" with the behavior of the standard
+C compiler, and second - help ensure compatibility with the standard C. In this mode, automatic
+type conversion is performed exactly as in standard C. The next difference between this mode and "compliance"
+mode is that in the compliance mode, automatic type conversion of formats for the required
+types "char" and "int" is not performed. By default, the compiler works in "compliance"
+mode. For switch mode from operation, use the option "-k" in the first stage of compilation.
+
+
+                   Compatible Mode of Compilation
+
+   In this mode are supported for two types of format: integer constant (intconst)
+and character constant (charconst). Typically specified formats are used exactly
+in the corresponding formats "int" and "char", except in cases where other type
+designations and representations are preserved and converted into corresponding,
+specified formats mismatch for different.
+  For simplification, in this mode, automatic type conversion formats for the required
+types "char" to "int" are not performed. The following agreements with type conversion apply:
+
+   unsigned  + ?  ->  unsigned
+   int       + ?  ->  int
+   char      + ?  ->  char
+   intconst  + ?  ->  intconst
+   charconst + ?  ->  charconst
+
+
+              Compatibility Mode with Standard C Language
+
+   Perform all arithmetic type conversions, consistent with the implementation
+of the standard C language. The main difference consists in the fact that SOLID C
+implements the type "char" for all assigned values. For this mode, the following
+rules of type conversion apply:
+
+   char            ->  int
+   unsigned + ?    ->  unsigned
+   int      + int  ->  int
+
+
+
+                        Recursive Functions
+
+   It is important that functions of the standard C language are recursive. In the framework of the SOLID C
+compiler there may be both recursive and non-recursive functions. For distinguishing
+functions there must be a type specifier and pre-reserving the following keyword:
+"recursive" - recursive and "nonrec" - non-recursive. These keywords
+are placed in the declaration of the function before the keyword and curly
+braces to perform. For clarification, the following example:
+
+nonrec main()
+{
+   printf("Hello, world!\n");
+}
+
+recursive
+int factorial(n)
+int n;
+{
+   return(n > 1) ? n*factorial(n-1) : 1;
+}
+
+int max(a,b)
+int a,b
+{
+   return(a > b) ? a : b;
+}
+
+   In the given example, two functions are defined: non-recursive function main() and
+recursive function factorial(). The function max() is deliberately shown without mode
+designation, therefore it will be executed as it is compiled by default. Typically,
+by default, the mode of execution of functions without recursive designation is used.
+For clarity, the designation can be changed using the following preprocessor directives:
+
+     #pragma nonrec
+     #pragma recursive
+
+   The first designation by default sets the mode of execution of functions as
+non-recursive. The second directive defines the nature for functions that
+are recursive (if it is not explicitly specified).
+For example, if no designation #pragma is used, the function max() will be executed
+according to the subsequent default mode of "recursive/non-recursive".
+The keyword "nonrec" allows, if necessary, to force the function to be non-recursive.
+At the same keywords, the compiler performs segmentation of generated object code,
+which becomes and occurs in a different way than in other compilers. In the development
+of some programs, a large number of functions may be non-recursive, therefore at the
+beginning of the source text should follow the directive designation: #pragma nonrec
+
+
+                   Functions with Variable Parameters
+
+   The SOLID C compiler handles functions of two types: with variable number
+of parameters and with fixed parameters. In functions of the first type the number and
+description of parameters may be unlimited, then for in functions of the second type for
+the same designation method. For example, functions printf, scanf and many other standard
+functions have a variable number of parameters. In the SOLID C compiler functions are
+designated with both types separately and using specialized declarations as follows:
+
+     In function declarations:
+        declarator
+           (declarator)
+           *declarator
+           declarator()
+           declarator(.)
+           declarator [constant expression]
+
+     In function pointers:
+        pointer declarator
+           *pointer declarator
+           pointer declarator()
+           pointer declarator(.)
+           pointer declarator [constant expression]
+
+   The designations "declarator(.)" and "pointer declarator(.)" indicate special
+for designation of functions with variable parameters. The designations "declarator()"
+and "pointer declarator()" characterize functions with fixed parameters.
+This method of designation of functions with variable parameters is used in the
+declarations of type cast, sizeof. For example, in the following designation of function func and fp
+is defined, that function with variable parameters:
+
+     int func(.), (*fp)(.);
+
+Before applying a function with variable parameters, we must often expand the parameter
+list in different ways. In practice, standard functions are functions with variable
+parameters, for example:
+
+     printf, fprintf, sprintf, scanf, fscanf, sscanf
+
+The designation of these functions is contained in the standard file "stdio.h".
+The call of a function with variable parameters is completely consistent with the call of a function
+with fixed parameters.
+   For functions that do not provide clear notation at the point of labor (lack
+of method of passage and parameters). Possibility of designation is only for the same
+function with variable parameters. Different functions, by the way, have optional
+parameters.
+   The definition of a function with variable parameters should be in the same
+beginning, before the body. Then appropriate type designation of function func,
+having function with variable parameters:
+
+int func(.);       /* This designation must be at the beginning */
+
+int func(nargs, args)
+int nargs, args;
+{
+  ...
+}
+
+   In the process of calling a function with variable parameters, several actual
+parameters are passed as two - receive call of the assignment. The value of nargs
+parameter contains the number of actual parameters - fixed beginning. Options
+for each parameter, how many actual parameters are really defined in the function
+with variable parameters on the calling side function. This limitation is determined
+by the fact that only the number can be defined parameters. At the same time, install
+type of the result for all parameters specified.
+   In order to organize the access and specify the parameters, we need to calculate
+offset from the defined parameters for call of the function of parameters. List of parameters
+(if not known) is used to search the array args. In other words, the value
+of the first of the parameters args is forwarded direct offset args. Then the next
+parameters are received from the array, shifted in the direction of increasing address. The offset is set
+sequentially as follows:
+
+     Offset of 2nd parameter = offset of args + 2
+     Offset of 3rd parameter = offset of args + 4
+
+In the following table is given the correspondence of parameters to their offsets:
+________________________________________________
+
+  Parameter Number          Offset
+________________________________________________
+
+       1             Offset of beginning of args array
+       2             Offset of beginning + 2
+       3             Offset of beginning + 4
+      ...
+       n             Offset of beginning + (n-1)*2
+________________________________________________
+
+   Careful correspondence of offsets to sequential parameters, given
+in the table, allows to organize access to these parameters. For example, for that
+to read from the array the second and third parameters of type "char", you need to include
+in the program:
+
+     (char)args         - reference to the first parameter of type "char"
+     (char)+(&args+1)   - reference to the second parameter of type "char"
+
+Note: if in the given example args has type "int", then according
+the designation, the value of &args is converted to type "int". Then following from the next
+document, the unit should be calculated according to the module &args+1, and the next unit "1" is
+converted in correspondence with the table of relative offset from the pointer unit:
+for that it is the same as for the beginning (except, the unit is defined for beginning
+in the integer expression sizeof(int*)). In the appropriate case it is "offset of beginning
+of array of parameters at some zero". Subsequently, the offset can be used to organize access
+to parameters of other types.
+   In the following sections, given examples of two functions with variable parameters:
+function sum returns the value of the sum of variable number of "int" parameters.
+Function cmax returns the maximum value from a range of "int" parameters and TINY (char),
+the number of the subsequent - variable.
+
+#pragma nonrec
+typedef char   TINY;
+
+int sum(.);
+TINY cmax(.);
+
+int sum(nargs, args)
+int nargs, args
+{
+    int i, *p;
+    for(i=0, p=&args; nargs --;)
+          i += *p++;
+    return i;
+}
+
+TINY cmax(nargs, args)
+int nargs;
+TINY args;
+{
+    int *p, max;
+    for(max=0, p=(int*)&args; nargs--; p++)
+        if(max < (TINY)*p)
+            max = (TINY)*p;
+    return max;
+}
+
+
+                Conversion of Logical Arithmetic
+
+   In order to achieve effective object code, the SOLID C compiler performs
+conversion of logical arithmetic. The essence of this optimization is that conversion
+of variables, returned type "char", is performed not only in whole, but also in parts.
+Since the processor Z80 and its instruction format make addition very efficient,
+but others less so. Logical arithmetic operations are especially effective
+for designation of specialized programs, supporting logical conversion.
+   Compiler evaluates assignments and relations relative
+
+     &&  ||  !  =  !=  >  <  >=  <=
+
+with type "char".
+  Traditionally, in logical variables, returned not containing integer internal
+symbols, specially defined in the use of type declaration typedef in type TINY for
+BOOL. The first definition contains logical objects, and the second - integer.
+Definition indicates the type, mentioned in the file standard library "types.h".
+
+   Since here several examples of use of logical operations, the following
+section provides specific examples of application!.
+
+   1). Type conversion and type casting
+
+   When performing logical arithmetic operations, special attention should be paid to
+type conversion and type casting. For example, in the following execution of arithmetic
+
+        int i;
+        TINY x,y;
+
+        x = 10; y = 30;
+        i = x * y;
+
+   Although the correct value is 300, the variable "i" contains an incorrect value
+of 44. This happens as a result of the fact that in the given execution multiplication
+is performed according to the rules of logical arithmetic, returning only the lower byte
+of the result. In order to obtain the correct result (the number 300), you need to convert
+to integer type, or use type casting, as done in the following example:
+
+        i = (int)x * (int)y;
+
+   Alternatively, you can use the following operation:
+
+        i = x << 8 | y;
+
+   When executing the shift operation, both operands of the logical operation shift,
+which are transferred for the next processing. But here you also need to specify casting.
+The value "y" must be converted to an unsigned type for "i" in the same way as in the
+multiplication operation:
+
+        i = (unsigned)x << 8 | y;
+
+   2). With type TINY (char) arithmetic operations return only numbers. The variable of type "char" is used
+for numbers. Therefore, before any arithmetic operation, where the result of the operation is a standard
+integer divisor. Therefore, if you execute the following program, the variable "i" will be assigned 255:
+
+        int i;
+        TINY x,y;
+
+        x = 2;
+        y = 3;
+        i = x - y;
+
+   In order to obtain the correct result, you must execute both operations in
+accordance with type "int":
+
+        i = (int)x - (int)y;
+
+   3). Parameter type matching
+
+   The SOLID C compiler strictly enforces the distinction between types "int" and "char".
+Therefore, actual and formal parameters must be clearly consistent with
+each other in type. The following example demonstrates an incorrect function call:
+
+func(x)
+TINY x;
+{
+   ...
+}
+main()
+{
+   func(1);    /* Incorrect function call */
+}
+
+You must make the call as follows:
+
+     func((TINY)1);
+
+   Parameter type matching is not checked at compile time. Therefore,
+the following special example shows how to avoid such errors.
+
+
+                     Register Declaration
+
+   Although the SOLID C compiler provides automatic register allocation of variables,
+in a way that allows to receive more effective object code. In the standard
+C language, is allowed (keyword "register") only a few variables from all variables
+(the total number of variables placed in registers depends on the registers available,
+in terms of which operating units will be used). Unlike the standard, the SOLID C
+compiler automatically performs optimal allocation of registers, in accordance with the
+program flow. At the same time, this can significantly improve the quality of generated code.
+However, there are variables that cannot be placed in registers, depending on the level of
+optimization. Therefore, the designation "register" differs somewhat from the designation "auto" and
+other class of declarations listed below.
+   In the following function of the program, the maximum 16 variables of static type standard
+placement will be placed in registers, either as variables of type "auto" or "register". To such
+type types also include "int", "char", "unsigned" and "pointer".
+   Features of the language allow only local variables. The SOLID C compiler
+also, of course, supports these features. However, in cases where you have variables
+that must be objects of register allocation register, sometimes there are problems. These
+are caused by the fact that these "temporary" registers are not accessible.
+For example, if you specify
+
+      int n;
+      n = 10;
+      scanf("%d", &n);
+      printf("%d", n);
+
+   If the input is 100, what will the value of the variable "n" be?. Certainly, 100.
+The compiler updates the value of the variable from the assignment statement and memory, if
+specify the address of this value of this variable. Specifically, problems arise if
+in the function call you specify it not in the right place as the parameter by reference.
+Consider the example:
+
+      int n;
+      int *p;
+      p = &n;
+      n = 10;
+     *p = 100;
+      printf("%d", n);
+
+   What should happen, would be that in the right place of the value of the variable "n" will be
+assigned to 100, and 10. After these register declarations, between the line "n=10", and
+another "printf("%d",n)", we figure out "&n". Therefore the compiler may not update "n" in memory.
+
+
+
+                Reference of SOLID C Compiler Limitations
+
+
+    Table of representation of data of different types
+-----------------------------------------------------
+   Type        Bitwidth      Range of values
+-----------------------------------------------------
+  char             8               0..255
+  short           16          -32768..32767
+  int             16          -32768..32767
+  unsigned        16               0..65535
+_____________________________________________________
+
+
+   1. Within the framework of the SOLID C compiler are supported identifiers of variables and
+functions up to a maximum of 30 characters in length. Observance of such restriction means
+that you should use unique designations for both variables and functions, and
+also achieves readability of program text.
+
+   2. Error messages are displayed on the error line and initial
+character (column in the line). Initial counting starts at 0. This means,
+that the error on the first character of the program text will be "zero line, zero column".
+
+   3. When specifying where to place the file is used the directive "#include"
+preprocessor, which is described as:
+
+     <filename>  - reference to a file, used in the subdirectory "INCLUDE"
+                    directory of installation.
+     "filename"  - reference to a file, used in the current directory of the source
+                    ".c" file.
+
+The path and filename are not checked. For example, if you specify directives
+
+     #include <stdio.h>
+     #include "common.h"
+
+In the first case, make a reference to the standard file of the library, used from the subdirectory
+and presetting the "INCLUDE" subdirectory of SOLID C installation (by default "SOLID"), and
+in the second case - to a file, used in the current directory of the source ".c" file.
+The compiler does not check whether the "INCLUDE" subdirectory is set up in
+the directory of the compiler.
+
+   4. Types long, float, double are not supported, but are recognized. Therefore,
+you should not use the words "long", "float" and "double" in the description of variables
+and functions.
+
+   5. Not supported bit fields in variables.
+
+   6. Restrictions on expressions and array dimensions. Errors for constants in
+array dimensions are identified with the type designation using "sizeof":
+      a) Right after the keyword "case" (in switch statement);
+      b) In the index of an array in the terms of its dimensions.
+Constants in array dimensions do not affect compilation (i.e., with static allocation).
+
+   7. Another difference from the standard C language are effective support for
+declarations of structure and union types (struct & union). In the standard he also
+with no support for these declarations can only exist in cases where
+the user has time to define the type and location of structure members in the same structure. The
+SOLID C compiler restricts these declarations in the same way, as they are shown in the code
+here. Thus, if in the code these declarations appear in different places and will
+be correctly processed by the compiler SOLID C.
+In the following example we examine the following designation:
+
+struct node {
+        char *word;
+        int count;
+        struct node *next;
+} pool[1000], *p;
+
+struct noad {
+        int atr;
+        struct noad *next;
+} table[10], *q;
+
+   In the standard C language, the following would be incorrect, because the
+member "next" exists in two different structures - "node" and "noad", which have different
+types and offsets. However, within the SOLID C compiler these codes are
+still considered valid.
+   The following operation example uses
+
+        p->next
+
+which returns a member of type "struct node" (because "p" is a pointer of type
+"struct node"). Processing such operations always allows accessing member fields via
+the direct pointer to the type. That is, with the operators "." and "->" the member field must be
+pointers of the appropriate type, having members designated in the structure definitions of the same type.
+For example:
+
+        i->count
+
+assumes "i" is a pointer of type "struct node", and returns "int" (integer). Therefore
+the SOLID C compiler also carries out verification. In order to eliminate such from the result,
+you need to perform type conversion of the expression as follows:
+
+        ((struct node *)i)->count
+
+In this type example, in order to make "->" work more comprehensively, before the "cast"
+operation, the following cast
+
+        (struct node *) i
+
+is placed in parentheses.
+   When you need to convert type pointer to "int", this is performed using the cast function,
+which should be performed correctly.
+   When you perform arithmetic operations in case of pointers of different
+kinds, you also must use the cast function. For example, in case of designation
+
+        int i;
+        char *p;
+        int *q;
+
+operations
+
+        p = i;
+        if(p == i)
+        q = p;
+        if(p == q)
+
+will be marked as errors.
+   The reason for these errors is that there is no implicit conversion between types of pointer and "int" (integer), and
+in comparison operations such conversion is possible. For the last type
+of error, because we look at both "p" and "q" as different pointers, but
+they are specialized by different types and therefore the compiler notes
+that this is an error.
+These errors can be eliminated, either by using the cast function, or by
+specifying the "-k" option in the first phase of compilation.
+   On the other hand, conversion of types from integer to pointer and vice versa
+is allowed. The reason for this is that in the language the integer constant 0 is used
+as a pointer of any kind. For example, the following
+
+        char *p;
+        if(p != 0)
+          p = 0;
+
+is correct.
+   Conversions between "int" and pointers are allowed within SOLID C. However,
+careful use of these tools helps ensure stability of the resulting program throughout,
+just as much proper use of the standard library.
+
+   8. When automatic conversion of types "pointer" and "int" is necessary,
+respectively. In the standard C language, assignment of pointer and integer (int) values
+is allowed, but in SOLID C conversion of types calls communication about an error. This
+behavior mode can be changed by specifying the option "-k" (in the first phase).
+
+   9. Type "char" is interpreted as a value for numbers, i.e., contains values
+0..255.
+
+  10. Within the framework of the standard C language, in which there are several early
+functions, as automatically implemented to return "int" values. The parameters
+of its type, which were from the list of parameters, are assumed as "int".
+Type mismatching may occur at compile time using the default rules. However,
+the entire style of program development by declaration designation helps that
+at the stage when there are function calls - automatic calls are called, and
+references are made correctly.
+   For functions that relate to functions of the standard library, mentioned
+in the file of standard definitions, therefore, from standard functions library
+can be used for objects. Therefore, for user programs should
+contain references to the file "stdio.h" in the same beginning of text, and designation
+#include <stdio.h>.
+   However, if in the first phase of compilation you specify the option "-k", designation
+of functions may differ by default. At this point, the number may be called
+differently, therefore, the entire style of programming, if there is
+desired compatibility with standard C language.
+
+  11. In this version, type checking is not supported for directive "#if". Instead,
+you can specify directive using: "#ifdef" or "#ifndef". You can also other
+variants of the directive "#if". Type checking may be used to compile when
+the program, executing certain parts or not at all. Therefore, you can perform
+exactly the same as with the result, if instead of the directive "if" the directive
+"#if" was used. For example, compare the text below in one or more program versions:
+
+Program 1:
+
+#if sizeof(FCB) != sizeof(char[36])
+      Open_MSX();
+#else
+    Open_OTHER();
+#endif
+
+Program 2:
+
+if (sizeof(FCB) != sizeof(char[36]))
+      Open_MSX();
+else
+   Open_OTHER();
+
+   12. Additional directives preprocessor "#pragma". Applied to this several
+different point specifications. This directive places one or more references to
+during the compiler of the program. Below, in the information examples are given several directives
+and its corresponding optimization directives:
+
+        1. #pragma optimize time
+
+This specifies optimization performed in such way that it does not reduce the segmentation
+of object code, characteristic of the short-time speed of execution, before in the
+case where it can reduce code length.
+
+        2. #pragma optimize size
+
+This also specifies, generating optimization, strives to reduce the length of the generated object code,
+even though it might be slightly slower in performance.
+
+        3. #pragma nonrec
+
+This directive terminates the default mode of execution of functions,
+as non-recursive.
+
+        4. #pragma recursive
+
+And accordingly to terminate the default mode of execution
+of functions as recursive.
+
+   13. The SOLID C compiler supports automatic register allocation of variables,
+which should always be designated as "auto" (automatic).
+
+   14. The SOLID C compiler supports compilation of text definitions. For functions
+perform type designation declaration of the program, containing definitions,
+and body definitions, and in its scope containing definitions. If in the first phase
+the option "-c" is specified, compile definitions are processed in the same
+way as corresponds to the standard C language.
+
+
+
+                         Additional Information
+
+                 Functions with Fixed Parameters
+
+   In the case of calling functions (functions with fixed parameters), the first
+three parameters are passed in registers, and the following ones - on the stack. If any one
+of the 3 parameters has type "char", then it is returned in the corresponding 8-bit
+register. Parameters (except first) of other types are placed in registers in pairs.
+The 4th parameter (if present) and all the following ones are placed on the stack, in the appropriate
+location (stack mode ?). At the bottom of the stack are returned two integers.
+Parameters are arranged on the stack in groups of two. Values of "char"
+parameters are returned in the high byte, and values of the other type are obtained in the
+remaining positions.
+  In mode compatible with the standard C language, the use of parameters of type
+"char" has the following feature: conversion from "char" to type designation and "int" occurs
+automatically (the high byte is filled), then after that is mismatching as "other type".
+
+_______________________________________________________________________
+
+ Type of parameter     First    Second   Third   Fourth    Fifth   ...
+_______________________________________________________________________
+
+  char                A        E        C       (SP+2)    (SP+4)  ...
+
+  Other type          HL       DE       BC       (SP+2)    (SP+4)  ...
+                                                (SP+3)    (SP+5)  ...
+_______________________________________________________________________
+
+
+                 Functions with Variable Parameters
+
+   When calling a function with variable parameters, all parameters are placed
+on the stack (in the appropriate location). The number of parameters placed on the stack is
+returned in register pair HL. At the bottom of the stack are returned two integers.
+   In "compliance" mode, "char" parameter is returned in the high byte, the value
+of the other type is obtained separately.
+   In mode compatible with the standard C language, "char" automatically
+converts to "int" type (the high byte is filled), then placed
+correctly as "other type".
+   Parameters of other types are arranged on the stack according to the rules established for
+the Z80 processor, and similarly: first the high byte, second - low byte.
+
+_______________________________________________________________________
+
+ Type of parameter    Quantity   First   Second   Third   ...
+_______________________________________________________________________
+
+ char                 HL       (SP+2)   (SP+4)   (SP+6)   ...
+ Other type           HL       (SP+2)   (SP+4)   (SP+6)   ...
+                               (SP+3)   (SP+5)   (SP+7)
+_______________________________________________________________________
+
+
+
+                      Return Values of Functions
+
+   When the function is being called by the program, the function returns its
+return value through registers. At the same time, a function of type "char" returns the value
+through register "A". Functions of other types return their value through register pair
+HL.
+  In mode compatible with the standard C language, the returned value is always
+returned through register pair HL, except in the case where the function returns
+type "char".
+  For proper return value and reception from a function that returns different values,
+you should use a pointer to the variable, as the parameter through other C-programs.
+
+
+                       Function Call Sequence
+
+   1. First, the calling program pushes the parameters and returns them to either
+registers or placed on the stack according to the rules, described above.
+   2. The program calls the function. Typically the word "call" is used.
+   3. After the function returns control, the parameters are removed from the stack
+(using the "pop" instruction). If the parameters are placed in registers,
+using the "pop" instruction is not necessary. It should be noted that in the case
+of multiple "pop" commands, the return value (through register "A" or "HL") of the
+function does not lose its value.
+   4. The value of the function is returned through register "A", if the function returns
+type "char". For functions of another type, the value is always returned through
+register pair HL.
+
+
+                Standard Calling Sequence of Function Parameters
+
+   The calling program at the beginning contains the stack pointer. In other
+words, contains the stack pointer for function entry is the same as it was when entering
+the function. Parameters stored on the stack must be removed by the calling
+program. The called function can modify the values of the parameters (both those
+which are passed through registers and those stored on the stack).
+The following note, that in the language the assembly, and in the framework of the
+call to the function are displayed on the values, so if the parameters are defined
+as structural parameters, then manipulation of the data to be called function is a value.
+   The return value of the function is returned in register "A" or in register pair
+HL - as the maximum of the type of the called function. The following is the correct
+designation in the following section.
+
+Example 1:
+
+   In the following example, an assembly function ISDIGIT is described, which returns
+the value of the function BOOL and register "A". The calling program determines the parameter
+type "char" through register "A".
+
+... Calling program (in C) ...
+
+typedef char BOOL;       /* Define "char" type as BOOL */
+...
+BOOL isdigit(c);
+char c;
+  ...
+  if (isdigit(c))
+  ...
+  ...
+
+... Called function (in assembly) ...
+
+         public isdigit_
+
+isdigit_:cp     '0'
+         jr     c,false
+         cp     '9'+1
+         ret    c          ; Yes, return true
+false:   xor    a          ; No, return false
+         ret
+
+
+Example 2:
+
+   This example corresponds to the case of calling a function, designated on assembly
+procedure.
+   The standard library functions printf and puts are called in assembly
+procedure. In this text, the standard library functions are in the standard library, therefore,
+these functions printf and puts do not need designation. However, suppose that some functions
+printf - in variable parameters, then the parameters are placed on the stack.
+In the following example, the parameters are always type string, and the other number of parameters,
+which are placed on the stack and in order. The number of parameters is determined in the calling
+function through register pair HL (in the provided example, determining the number 1). After
+returning from the calling function, you should perform the operation to remove from the stack
+(in the example the "pop" instruction will be executed 1 time). Note the fact that the parameters
+are removed from the stack by the calling program, not the called.
+   On the other hand, the function puts is presented as a function with fixed
+parameters, therefore a string pointer is determined through register pair HL.
+
+         extern  printf_, puts_
+
+example: ld     hl,msg
+         push   hl         ; Place on the stack the address of the string
+         ld     hl,1       ; Load the number of parameters
+         call   printf_    ; Call the procedure that performs output
+         pop    hl         ; Remove parameters from the stack
+         ;
+         ld     hl,msg     ; Load the address of the string
+         jp     puts_      ; Call the function that outputs the string
+
+msg:     db     'Hello, world!',0Ah,0
+
+
+
+                  Recommendations on Programming
+
+   1. Avoid using non-recursive functions, if for any reason you are going to use recursion.
+Avoiding such situations, use external variables through which parameter passing and temporary
+variables that are not assigned to allocate registers when properly efficient object code.
+
+   2. If you specify the compatibility mode with the standard C language (using the "-k" option),
+then the amount of object code will be larger, therefore specifying this mode should
+use only in cases where compatibility with the standard C language should be higher
+than effective object code.
+
+   3. Use type "char" (with 8-bit value range) only for numbers. Arithmetic operations are
+performed in logical 8-bit operations more efficiently than with numbers, stored in words (types "int" or "unsigned").
+Therefore, variables, having numeric values with a range from 0 to 255,
+should be defined as TINY (char).
+
+   4. When using 16-bit variables, you should define as type "unsigned", which in many
+situations should be prioritized, before "int".
+The reason for this is that in the processor Z80 arithmetic operations are performed correctly
+(in particular, shift operations left and right by numbers)
+are arranged in their manner.
+
+   5. Definitely set the static mode for external variables.
+Variables, defined as external or internal, are not placed into
+registers. Therefore, if the goal is to achieve high speed execution of the program, you should
+define external variables as "static", and functions as "extern", then the result will be contradictory -
+effective object code will be lost. The SOLID C compiler itself allocates registers,
+therefore you should clearly define local variables, as "auto".
+
+
+
+                   Reserved Words and Keywords
+
+   The following words are used for keywords and designation in SOLID C and are also
+used in the declarations of types or types of variables.
+
+        asm             float           signed
+        auto            for             static
+        break           goto            struct
+        case            if              switch
+        char            int             typedef
+        const           long            union
+        continue        nonrec          unsigned
+        default         recursive       void
+        do              register        volatile
+        double          return          while
+        else            short
+        extern          sizeof
+
+
+
+                    Preprocessor Directives
+
+        define          nonrec
+        endif           optimize
+        error           pragma
+        ifdef           recursive
+        ifndef          size
+        include         time
+        line            undef
+?...
+

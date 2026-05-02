@@ -1,0 +1,154 @@
+             Installation Instructions for SOLID C Compiler for ESTEX
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+                           Return Codes
+
+These codes are returned (1st and 2nd phases):
+
+   00h  - Ok
+   0FFh - There were errors/warnings, errors are displayed on screen or when working with files.
+
+
+                        1st Phase of Compilation
+
+1. For compilation "required" source file always needs the "-k" option.
+
+2. In options: -dNAME, -jN, -oNAME and -rP:S:H should not be checked.
+
+3. The maximum length of the path (disk\dir\file.ext) of the file
+   is equal to 80 characters.
+
+4. The "file.err" file is created always in the current directory of the source .c file.
+
+5. The format of include-file is only:
+
+     #include <file.ext>  - search only in the subdirectory "INCLUDE"
+                            where the compiler is installed.
+
+     #include "file.ext"  - search only in the directory where the source
+                            .c file is located.
+
+The path and file name are not checked!. The "INCLUDE" directory is required.
+
+                        2nd Phase of Compilation
+
+1. Optimization is carried out for several constructs, but is correct
+   compared to the opposite direction.
+
+2. Incorrect assembly errors:
+     a) Extension was not specified for TMC-file
+     b) Designation for compilation was not specified correctly in the previous phase
+
+
+
+                           Assembler
+
+Note: Some assembler AS is compatible with assembler M80 from Microsoft
+in the format of assembly source texts - in the documentation for AS the
+documentation of assembler M80 is used. The difference of assembler AS from M80 is manifested
+in that in AS are supported a few opcodes of M80 (in particular, correct output
+of instructions).
+
+1. The maximum length of path (uppercase letters and directories) of the file
+   is equal to 64 characters.
+
+2. In the assembly NAME('...') you can use such symbols (")
+   windows.
+
+3. For include-file you can specify only the extension. In this case it will
+   be used the extension by default ".asm". This is the same rule as in the
+   source .asm file.
+
+4. Not supported some variants of designations of registers:
+
+        HX/XH      LX/XL  
+        HY/YH      LY/YL  
+        HIX/IXH    LIX/IXL
+
+5. The commands "EQU" and "=" are equivalent.
+
+6. The maximum length of symbols declared in the module file (rel-file) depends on the mode of
+   assembler work:
+
+        6 characters   -  when specifying option "-t"
+        8 characters   -  by default
+       30 characters   -  when specifying option "-x" (rel-format extension)
+
+   It should be noted that in object files extension of rel-format does not work library. Therefore, for
+   compilation of library files, you should assemble specify the "-x" option.
+
+7. Return codes of the assembler:
+
+      00h  - Ok
+      0FFh - There were errors/warnings, errors are displayed on screen
+             or when working with files.
+
+
+
+                             Linker
+
+To create a binary C-program, collected in the "clib.irl" library, you must always
+specify the "/gXMAIN" option. This determines the correct entry point to the
+startup code of the C-program. See the "clib" library.
+
+1. Linker works only with object input files. The search path and format
+   of files are not supported.
+
+2. Incorrect assembly errors on:
+     a) Full work with "@list" file
+     b) Incorrect reading from request-file
+
+3. When creating exe-file, parameters are: ORG = 4100h, Stack = 0C000h.
+   (The value of ORG can be changed using the "/r" option).
+
+4. The "list" file - contains the module name and documents. Each document
+   begins with the line number. In the list file should be one name per
+   line. The module name is limited to 256 bytes.
+
+5. File order: first *.irl files, then *.rel files. If not found, output
+   error message: "*.rel file not found".
+
+6. The maximum length of symbols - 30 characters.
+
+7. Labels with ?labels are not output to sym-file and are not stored. Standard
+   "local" only for option /Q.
+
+8. After successful compilation of sections of 16kB for dll-library (output
+   appropriate messages).
+
+9. Return codes of the linker:
+
+      00h  - Ok
+      0FFh - There were errors output on screen or when working with files.
+
+
+
+                            File Manager
+
+1. When listing input files later, you must use the correct extension,
+   not the extended content.
+
+2. When creating a library: if the library coincides with the name of the source
+   file, then you must specify the extension of the library, so that it is not
+   overwritten by the source file. In the case of rel-files the extension does not need to be
+   specified. File search conditions are slightly different for standard.
+
+3. Wildcard characters "*" and "?" are supported only for file retrieval
+   mode (key "e"). In other modes, you must specify the actual file
+   name.
+
+4. Multiple file extension is supported only for library files. For rel-files
+   extension is not supported and is used the extension used in the library.
+
+5. In option l(ist) (list of modules in the library), fields "Code size: ..."
+   and "Data size: ..." are output in the correct format.
+
+6. In commands d(ump) and l(ist), output to the screen stops with the pause/continuation when
+   stopping at long time. On pause pressing Esc - exit from mode.
+
+7. Return codes of the file manager:
+
+      00h  - Ok
+      0FFh - There were errors file operations or library operations.
+

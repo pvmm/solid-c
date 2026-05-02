@@ -1,0 +1,136 @@
+                             Linker
+
+
+   The LD linker is designed for assembling binary programs or dll-libraries
+from separate object modules. In the role of object modules can be files
+in rel-format or libraries in irl-format (created by linker ol.exe). Description of "rel", "irl"
+formats can be found in files "rel.rus" and "irl.rus".
+
+The command line for calling the linker has the following format:
+
+     LD [/keys] [outfile=] infile[/keys] [,infile[/keys] ...] [@ list]
+
+Where:
+	keys         -  linker options
+	outfile      -  name of output program file
+	infile       -  file in "rel" or "irl" format
+	@ list       -  list file
+
+
+Example of linker call:
+
+     LD hello.rel
+
+After execution of this command, an output file "hello.exe" will be created.
+
+For its operation, the linker can create temporary files on disk. Therefore,
+for fast operation, it is recommended to use a fast disk.
+
+Linker options:
+
+      A          Use long names for symbol table storage
+      D##        Set displacement of DATA segment
+      E          Do not create EXE file format
+      Glabel     Set entry point 'label' in program body
+      L          Create listing file (placed after the file name)
+      P##        Set displacement of CODE segment
+      Q          Output labels with ?labels to screen
+      R##        Set offset of load address (set ORG of program)
+      S          Output list of records to screen
+      T[type:ver]  Create DLL library. Type - library type. Designation after;
+                 Ver - library version. Colon ":" separates parameters.
+      U          Replace "@" with "_" in record names
+      Y          Exclude DATA segment from output file
+      X          Do not create SYM file
+
+
+
+                        Creating DLL-Libraries
+
+To create a dynamic library, you need the option "t". Note that the
+difference is that it does not create an exe-file.
+After successful creation of dll-library with a maximum size of 16 kB.
+In this case, the linker outputs appropriate messages, but the library
+is still created and returned.
+
+Creating dll-library uses signature flag "L1". Libraries of this
+format differ from format "L0" only in that the table is relocated
+immediately in the "own" code section.
+Creating dll-library is performed and registered automatically, unless
+you explicitly specified these bytes when designated assembly texts.
+For more information on dll-libraries, see the documentation describing
+dll-library creation.
+
+Example of linker command line:
+
+     LD /TSymple library:0001 test.rel
+
+Where:
+       "Symple library"  - string contained in designation of library.
+                           String designation can contain any characters.
+                           Maximum designation length is 16
+                           characters, excess will be output as error.
+
+       "0001"            - version number of library in hexadecimal.
+                           Can contain characters 0..9 and A..F (a..f).
+
+       "test.rel"        - object file containing modules for library creation.
+
+If you do not specify one of the parameters (or all) options, but the ":" character separates
+parameters, then the separator must always be present. In case of missing designation - in
+the embedded directory of the library will be empty string. In case of missing version
+number - in the embedded library will be zero version. Examples of option calls:
+
+     LD /Tsymple library: test.rel
+     LD /t library name: test
+     LD /T:010B test.rel
+     LD /t:7 test
+     LD /t: test.rel
+
+Important note that the string contained in designation of library is read immediately from
+right after the "t" option character. For example, if you specify
+
+     LD /T Example:0001 test.rel
+
+then the designation string in the embedded library will be " Example", i.e.
+starting with a space.
+
+
+
+                          List File
+
+   The list file is necessary for "automation" of repeated assembly of
+programs. Every time you create a list file and run a program, on the
+command line simply once (command) pass the line of parameters again.
+The list file can contain all the parameters required for each run of a separate
+document, each line beginning with a new line. In the list file, each line should be
+a separate parameter line. The list file is limited to 256 bytes and the file
+size must not exceed this.
+Examples of linker calls with list files:
+
+     LD @ comp.txt
+
+ or
+
+     LD @list
+
+
+Examples of list files.
+
+Example 1
+
+test=prog,clib.irl/l/gxmain/x
+
+
+Example 2
+
+test=prog,
+clib.irl/l
+/gxmain
+/x
+
+In both examples the program is assembled with output file name "test". In the program
+used the input object file "prog.rel", library "clib.irl"
+and linked to program entry point set at label "xmain" (this is the required entry
+point for C programs running from the "clib.irl" library). The option "x" disables
+creation of sym-file.

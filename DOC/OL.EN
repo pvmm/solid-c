@@ -1,0 +1,31 @@
+                         Library Manager
+
+
+The OL library manager is used for working with libraries in IRL-format. Information
+about this format can be found in file "irl.rus". The command line for calling the
+library manager has the following format:
+
+    OL <option> <library_name> [<module_name1> <module_name2> ...]
+
+Example:
+
+    OL a mylib.irl module1 module2 module3
+
+In this example to library MYLIB.IRL are added three object
+modules (rel-files). If file MYLIB.IRL does not exist, a new
+library is created with the specified modules.
+
+
+Library Manager Options:
+
+      A    - Add module(s) to library. If the specified library
+             does not exist, it is created.
+      D    - Output list of contents of library to screen.
+      E    - Extract module(s) from library and save them to file.
+             In this case wildcards can be used
+             characters "*" and "?".
+      L    - Output list of modules in library to screen.
+      R    - Rebuild library.
+      T    - Check integrity of all modules in library for
+             proper external references.
+

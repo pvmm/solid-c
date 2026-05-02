@@ -1,0 +1,400 @@
+Last Update: 3.09.2004
+
+
+
+                   Standard Library Function Reference
+
+
+
+
+Note.
+For functions with standard input/output, format strings are converted without
+modification and in output records are determined by a standard specification conversion,
+performed using the following format:
+
+        %  [-]  [[o]w]  [.n]c
+
+   Flag "-" indicates that the field must be left-aligned shifted right (normally
+field is shifted left).
+   Flag "w" specifies the maximum field width on output. If before
+flag "w" is placed blank, then the field will differ from zero in number of characters
+designated "width".
+  Flag ".n" applies only in the case where the conversion specifier is
+string (%s). Within width ".n" is set the maximum number of characters
+output in the string line.
+   Character "c" can be replaced by one of the following values:
+
+        d  - signed decimal number;
+        u  - unsigned decimal number;
+        o  - octal number;
+        x  - hexadecimal (lower case);
+        s  - character string;
+        c  - character.
+
+   Information, in the implementation is the appropriately type conversion
+specified in output records for clarity. For example, in case
+of consecutive "%%" will output one character "%".
+
+
+
+
+	ABORT
+
+	#include <stdlib.h>
+
+	void abort()
+
+	Description.
+
+	Function outputs to screen the message "Abnormal program termination"
+(abnormal program termination) and terminates execution with return code 1 or
+setting the signal handler 3.
+
+
+	ABS
+
+	#include <stdlib.h>
+
+	int abs(int n);
+
+	Description.
+
+	Function abs returns the value of n, equal to the absolute value of n.
+
+
+	ABSREAD
+
+	#include <dos.h>
+
+	char absread(char disk, int nsect, char count, char buffer)
+
+		disk   - disk number
+		nsect  - number of starting sector
+		count  - number of sectors to read
+		buffer - buffer for storing read data
+
+	Description.
+
+	Absolute read from disk. Function reads from disk one or
+several sectors starting with the specified sector relative offset. Sectors
+are numbered from 0 from the beginning of the disk (from physical!) disk. For example,
+the designated sector for the first physical disk, number 0, and then the first
+sector of FAT starts at sector 1, etc.
+Function returns 0 for successful completion of the operation. In case of error
+returns -1 (0FFh) and errno contains the error code.
+
+
+	ABSWRITE
+
+	#include <dos.h>
+
+	char abswrite(char disk, int nsect, char count, char buffer)
+
+		disk   - disk number
+		nsect  - number of starting sector
+		count  - number of sectors to write
+		buffer - buffer with data
+
+	Description.
+
+	Absolute write to disk. Function writes to disk one or
+several sectors starting with the specified sector relative offset. Sectors
+are numbered from 0 from the beginning of the disk (from physical!) disk. For example,
+the designated sector for the first physical disk, number 0, and then the first
+sector of FAT starts at sector 1, etc.
+Function returns 0 for successful completion of the operation. In case of error
+returns -1 (0FFh) and errno contains the error code.
+
+
+	ATEXIT
+
+	#include <stdlib.h>
+
+	char atexit(*func)
+
+	Description.
+
+	Function registers (enters in its list) function *func as
+"exit function", i.e., processed before exit from the program. In case of normal
+program termination, exit calls (as parameters) "exit function"
+one by one before control transfer to the operating system. Multiple calls to atexit register
+various exit functions. Registered functions have no parameters. Up to 8 functions
+can be registered, which are executed in the order "last entered - first executed" (LIFO).
+Function atexit corresponds to the ANSI standard and to some implementations
+function onexit, if compatibility with ANSI is required.
+Function returns 0 if everything is correct and NULL if error
+(if already registered maximum number of exit-functions).
+
+Example
+         main()
+         {
+            atexit(func1);		// "Exit Function 1 called"
+            atexit(func2);		// "Exit Function 2 called"
+            printf("Main quitting ...\n");
+         }
+
+Output:
+
+          Main quitting ...
+          Exit Function 2 called
+          Exit Function 1 called
+
+
+	ATOI
+
+	#include <stdlib.h>
+
+	int atoi(*string)
+
+	Description.
+
+	Function converts a character string to integer value.
+Input string is represented as a sequence of characters, which may be
+white space characters or numeric characters designated by the type designation.
+Function performs reading of the input string, but only until
+the first character that cannot be recognized as a number (or the first
+character ending the string).
+Function returns a value of type int.
+Return value is 0 if input cannot be converted to
+value of integer type. In case of overflow, return value is
+undefined.
+
+
+	BDOS
+
+	#include <dos.h>
+
+	char bdos(char n, int doshl, char dosa)
+	int bdosh(char n, int doshl, char dosa)
+
+	Description.
+
+	Function executes system call whose number is specified
+in n. Parameters doshl and dosa correspond respectively to registers HL and A.
+Function executes call RST 10h for system call.
+Function can be used only for system calls that do not accept
+parameters or accept them only in registers HL and A.
+Function returns the value of register A, corresponding to the system call.
+
+Note: For this function should be used only for system calls where
+error is indicated directly by setting a flag or register.
+I.e., in C-program cannot access this flag, unless return value
+is checked separately. In this case, should be used
+function intdos.
+Function bdosh differs from bdos only in that returns a value
+contained in register HL.
+These functions can be used for DOS calls: 02h, 0Ah, 0Bh, 0Eh, 11h, 1Bh,
+1Ch, 1Dh, 1Eh, 5Ch functions.
+
+
+	BSEARCH
+
+	#include <stdlib.h>
+
+	void *bsearch(*key, *base, num, size, *compare)
+
+		char *key;         -  pointer to search key (string)
+		char *base;        -  pointer to array
+		unsigned num;      -  number of array elements
+		unsigned size;     -  size of each element
+		int (*compare)();  -  pointer to comparison function
+
+	Description.
+
+	Function bsearch performs binary search in a sorted array.
+Parameter compare must point to a procedure provided by the user. During
+search, function bsearch may call this procedure several times, with each call passing
+a pointer to two array elements. Compare procedure must compare the elements, and then return
+one of the following int values:
+
+        < 0      element1 < element2
+          0      element1 = element2
+        > 0      element1 > element2
+
+Function bsearch returns a pointer to the first match of key in the array.
+Returns NULL if key is not found in array.
+
+
+	CALLOC
+
+	#include <malloc.h> or <stdlib.h>
+
+	char *calloc(int n, int size)
+
+	Description.
+
+	Function allocates memory for array of n elements,
+each of size bytes. All allocated memory is initialized to 0.
+Function returns a pointer to the allocated memory.
+If allocation is unsuccessful, returns NULL value.
+
+
+	CGETS
+
+	#include <conio.h>
+
+	char *cgets(*str)
+
+	Description.
+
+	Function reads a string of characters from keyboard console, storing the string
+and its length in parameter str. Parameter str must be a pointer to a character array.
+The first element of array - str[0] must contain the maximum length
+(in characters) of the input string. The array must be sufficiently
+large to accommodate the string and terminating character. Function continues reading characters
+until it receives Enter key (0x0D) or maximum number of characters
+is reached. At the same time, the input string is not displayed on screen. The string is stored
+starting at str[2] of the array. At the same position in array str[1] is stored
+actual length of the string.
+Function returns a pointer to the beginning of the string, located in str[2].
+In case of error, return value is undefined.
+
+
+	CHDIR
+
+	#include <direct.h>
+
+	char chdir(char *pathname)
+
+	Description.
+
+	Function changes the current directory and current drive if
+they are specified in pathname. If the path begins with "\" - this means the path from the root
+directory, regardless of the current directory. Pathname must refer to existing
+directory.
+Function returns value 0 if the directory change was successful.
+On error, returns -1 (0FFh) and errno contains the error code.
+
+
+	CLEARERR
+
+	#include <stdio.h>
+
+	void clearerr(FILE *fp)
+
+	Description.
+
+	Function clearerr relates to low-level input/output.
+Function clears in FILE structure of file the 4th bit "error flag"
+and 5th bit "end of file flag". Error flag is automatically
+set as follows: if an error occurs for a file, then subsequent
+operations on this file will return an error value until such time as
+the user calls function clearerr or rewind.
+
+
+	CLRSCR
+
+	#include <conio.h>
+
+	void clrscr()
+
+	Description.
+
+	Function clears the entire screen.
+
+
+	CPRINTF
+
+	#include <conio.h>
+
+	int cprintf(char *format, arg1, arg2, ...)
+
+	Description.
+
+	Function outputs and converts according to format string of characters and values
+from keyboard console to screen. Other parameters specify values and types, which
+correspond to the types, designated in the format string.
+Function returns the number of displayed characters. In case of error on output, function
+returns a negative value.
+
+
+	CPUTS
+
+	#include <conio.h>
+
+	void cputs(char *str)
+
+	Description.
+
+	Function outputs a text string from keyboard console to screen. The string
+must be terminated with null.
+
+
+	CREAT
+
+	#include <io.h>
+
+	uint creat(char *name, int attr)
+	uint creat(char *name, char attr)
+
+	Description.
+
+	Function is low-level input/output.
+Function creat creates a new file. If the file already exists, it is
+truncated to zero length. The value of attr consists of several constants:
+S_IWRITE and S_IREAD, defined in "stat.h". If you need to set multiple flags,
+combine them using logical OR "|".
+Function returns a file descriptor.
+On error, returns value -1 (0FFFFh) and errno contains the error code.
+
+Function returns the file descriptor if Ok.
+On error, returns value -1 (0FFFFh) and global errno contains
+the error code.
+
+
+	DEC8
+
+	#include <stdlib.h>
+
+	void dec8(char value)
+
+	Description.
+
+	Function outputs parameter value in decimal format with output to
+screen. The output value range is 0..255. Function does not return any
+value.
+
+
+	DEC16
+
+	#include <stdlib.h>
+
+	void dec16(uint value)
+
+	Description.
+
+	Function outputs parameter value in decimal format with output to
+screen. The output value range is 0..65535. Function does not return any
+value.
+
+
+	DEC32
+
+	#include <stdlib.h>
+
+	void dec32(uint high, uint low)
+
+	Description.
+
+	Function outputs two 16-bit parameters high (high byte) and
+low (low byte) as one value. Output is performed in decimal format
+with output to screen. The output value range is 0...4 billion.
+Function does not return any value.
+
+
+        DISABLE
+
+	#include <dos.h>
+
+	void disable()
+
+	Description.
+
+	Function disables interrupts.
+
+
+	DIV
+
+	#include <stdlib.h>
+[...]
+
