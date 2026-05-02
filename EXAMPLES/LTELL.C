@@ -13,7 +13,7 @@ void main()
       pos->low = 10;
 
       if((lseek(fd, pos->high, pos->low, SEEK_SET)) == -1)
-          printf("Ошибка перемещения\n");
+          printf("Seek error\n");
       pos=ltell(fd);
       printf("\n%04X %04X", pos->high, pos->low);
       close(fd);

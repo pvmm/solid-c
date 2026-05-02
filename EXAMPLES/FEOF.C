@@ -1,28 +1,25 @@
-               FEOF
-            
-#include <stdio.h>               для объявления функции
+#include <stdio.h>
 int feof(FILE *fp);
             
-  Функция (реализованная как макро) определяет, достигнут ли конец задан-
-ного файла. Если конец файла (EOF) достигнут, то становятся недоступными
-операции чтения, т.е. при каждой операции чтения, будет возвращаться приз-
-нак конца файла, пока файл не будет закрыт или вызваны функции rewind,
-fsetpos, fseek или clearerr.
-Если текущая позиция является концом файла (EOF), функция возвращает нену-
-левое значение. Если текущая позиция не является концом файла - возвраща-
-ется значение 0. Функция feof ошибок не возвращает.
+/* The function (implemented as a macro) determines whether the end of file
+(EOF) has been reached. If the end of file (EOF) is reached, it is set by standard
+read functions, i.e., after each read function call, the EOF indicator will be set
+until the file is closed or until the rewind, fsetpos, fseek, or clearerr functions
+are called.
+If the current position is at the end of file (EOF), the function returns a non-zero
+value. If the current position is not at the end of file - the function returns
+a value of 0. The feof function does not report errors. */
 
-#include <stdio.h>
 FILE *fp;
 main()
 {
    if((fp=fopen("file.dat", "r")) == NULL)
      {
-       printf("Ошибка открытия файла\n");
+       printf("File open error\n");
        exit(1);
      }
    while(!feof(fp))
        fgetc(fp);
-   printf("\nФайл прочитан, встретился EOF\n");
+   printf("\nFile reading completed, EOF reached\n");
    fclose(fp);
 }

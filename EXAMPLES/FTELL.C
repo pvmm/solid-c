@@ -11,7 +11,7 @@ void main()
       pos->low = 20;
 
       if((fseek(fp, pos->high, pos->low, SEEK_SET)) == -1)
-          printf("Ошибка перемещения\n");
+          printf("Seek error\n");
       pos=ftell(fp);
       fprintf(stdout,"\n%04X %04X", pos->high, pos->low);
       fclose(fp);

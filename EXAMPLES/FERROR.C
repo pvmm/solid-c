@@ -11,9 +11,9 @@
 FILE *fp;
 char *string;
             
-   /* следующий пример вводит данные в файл и проверяет,
-      не возникла ли ошибка при записи. Перед записью
-      данных в файл, он должен быть предварительно открыт. */
+   /* The following example writes a string to a file and checks
+      whether an error occurred during writing. Before writing
+      a string to a file, you should first make sure it exists. */
    fprintf(fp, "%s\n", string);
    if(ferror(fp))
      {

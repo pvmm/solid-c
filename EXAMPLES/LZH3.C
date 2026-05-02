@@ -7,7 +7,7 @@
 	MSX-C PROFI adaptation by MaxWolf, Aug-Sep 1992
 	            EOF bugfix 1st April 1993
 
-	Компиляция:
+	Compilation:
 	cc1 -m -c lzh3.c
 	cc2 lzh3
 **************************************************************/
@@ -23,10 +23,10 @@ char encount(), deinc(), decount(), memmove();
 
 /********** LZSS compression *************/
 
-#define N		4096		/* размер буфера */
-#define F		60		/* предварительный размер буфера */
+#define N		4096		/* sliding window size */
+#define F		60		/* lookahead buffer size */
 #define THRESHOLD	2
-#define NIL		N		/* лист дерева */
+#define NIL		N		/* tree node null */
 
 
 extern char text_buf[N + F - 1];
@@ -35,19 +35,19 @@ extern int  lson[N + 1], rson[N + 257], dad[N + 1];
 
 
 
-/* инициализация дерева(ев) */
+/* Initialize tree(s) */
 static int InitTree()
 {
    int *i, n;
 
    for(i = &rson[N + 1], n = 256; n--;)
-        *i++ = NIL;			/* корень */
+        *i++ = NIL;			/* right child */
    for(i = dad, n = N; n--;)
-        *i++ = NIL;			/* узел */
+        *i++ = NIL;			/* father node */
 }
 
 
-/* занести (вставить) в дерево */
+/* Insert node (and store) into tree */
 static int InsertNode(r)
 int r;
 {
@@ -100,11 +100,11 @@ i1:				dad[r] = p;
 		rson[i] = r;
 	else
 		lson[i] = r;
-	dad[p] = NIL;  /* удалить p */
+	dad[p] = NIL;  /* delete p */
 }
 
 
-/* удалить из дерева */
+/* Delete from tree */
 static int DeleteNode(p) int p;
 {
 	int  q, i;
@@ -137,21 +137,20 @@ static int DeleteNode(p) int p;
 
 
 
-/* Кодирование Хаффмана */
+/* Huffman encoding */
 
-#define N_CHAR     (256 - THRESHOLD + F)
-			/* kinds of characters (character code = 0..N_CHAR-1) */
-#define T          (N_CHAR * 2 - 1)	/* размер таблицы */
-#define R          (T - 1)		/* позиция корня */
-#define MAX_FREQ   0x8000		/* updates tree when the */
-					/* root frequency comes to this value */
+#define N_CHAR     (256 - THRESHOLD + F)	/* kinds of characters (character code = 0..N_CHAR-1) */
+#define T          (N_CHAR * 2 - 1)		/* table size */
+#define R          (T - 1)			/* root node */
+#define MAX_FREQ   0x8000			/* updates tree when the */
+						/* root frequency comes to this value */
 typedef char uchar;
 
 
 
-/* Таблицы кодирования и декодирования 6-ти верхних (upper) бит позиции */
+/* Encoding and decoding tables for 6-bit (upper) positions */
 
-/* для кодирования */
+/* Encoding table */
 static uchar p_len[64] = {
 	0x03, 0x04, 0x04, 0x04, 0x05, 0x05, 0x05, 0x05,
 	0x05, 0x05, 0x05, 0x05, 0x06, 0x06, 0x06, 0x06,
@@ -163,19 +162,7 @@ static uchar p_len[64] = {
 	0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08
 };
 
-static uchar p_code[64] = {
-	0x00, 0x20, 0x30, 0x40, 0x50, 0x58, 0x60, 0x68,
-	0x70, 0x78, 0x80, 0x88, 0x90, 0x94, 0x98, 0x9C,
-	0xA0, 0xA4, 0xA8, 0xAC, 0xB0, 0xB4, 0xB8, 0xBC,
-	0xC0, 0xC2, 0xC4, 0xC6, 0xC8, 0xCA, 0xCC, 0xCE,
-	0xD0, 0xD2, 0xD4, 0xD6, 0xD8, 0xDA, 0xDC, 0xDE,
-	0xE0, 0xE2, 0xE4, 0xE6, 0xE8, 0xEA, 0xEC, 0xEE,
-	0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7,
-	0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
-};
-
-
-/* для декодирования */
+/* Decoding table */
 static uchar d_code[256] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -246,25 +233,8 @@ static uchar d_len[256] = {
 	0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08,
 };
 
+extern unsigned freq[T + 1];	/* frequency table */
 
-extern unsigned freq[T + 1];	/* таблица частоты */
-
-extern int prnt[T + N_CHAR];	/* pointers to parent nodes, except for the */
-                      /* elements [T..T + N_CHAR - 1] which are used to get */
-                      /* the positions of leaves corresponding to the codes. */
-
-extern int son[T];    /* pointers to child nodes (son[], son[] + 1) */
-
-static unsigned getbuf;
-static uchar getlen;
-
-
-#define GetBit()	_GetBit((char)0)
-#define GetByte()	_GetBit((char)1)
-
-
-
-/* получить один/восемь бит */
 /* get one/eight bit(s) */
 static int _GetBit(f)
 char f;
@@ -516,9 +486,9 @@ static int DecodePosition()
 }
 
 
-/*-- Упаковка/Распаковка --*/
+/*-- Compression/Decompression --*/
 
-/* Упаковка */
+/* Encoding */
 char Encode()
 {
 	int  i, c, len, r, s, last_matchlength;
@@ -569,7 +539,7 @@ char Encode()
 }
 
 
-/* Распаковка */
+/* Decoding */
 char Decode()
 {
 	int i, j, k, r, c;
