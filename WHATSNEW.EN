@@ -1,0 +1,25 @@
+### What’s New
+
+**Version 3.0 (work in progress)**
+
+* Improved C11 compatibility
+* Added support for additional compilers
+* Expanded standard library coverage
+* Numerous bug fixes and internal improvements
+
+---
+
+**Version 2.x**
+
+* Added new modules for string and memory handling
+* Improved portability across platforms
+* Better error handling in several functions
+* Fixed issues with edge cases in parsing and formatting
+
+---
+
+**Version 1.x**
+
+* Initial release of the library
+* Basic implementation of standard C functionality
+* Core utilities for working with strings, memory, and I/O
