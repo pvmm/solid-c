@@ -8,20 +8,14 @@ Last Update: 3.09.2004
 
 
 Note.
-For functions with standard input/output, format strings are converted without
-modification and in output records are determined by a standard specification conversion,
-performed using the following format:
+
+For functions with standard input/output, format strings are converted without modification and in output records are determined by a standard specification conversion, performed using the following format:
 
         %  [-]  [[o]w]  [.n]c
 
-   Flag "-" indicates that the field must be left-aligned shifted right (normally
-field is shifted left).
-   Flag "w" specifies the maximum field width on output. If before
-flag "w" is placed blank, then the field will differ from zero in number of characters
-designated "width".
-  Flag ".n" applies only in the case where the conversion specifier is
-string (%s). Within width ".n" is set the maximum number of characters
-output in the string line.
+   Flag "-" indicates that the field must be left-aligned shifted right (normally field is shifted left).
+   Flag "w" specifies the maximum field width on output. If before flag "w" is placed blank, then the field will differ from zero in number of characters designated "width".
+   Flag ".n" applies only in the case where the conversion specifier is string (%s). Within width ".n" is set the maximum number of characters output in the string line.
    Character "c" can be replaced by one of the following values:
 
         d  - signed decimal number;
@@ -31,9 +25,7 @@ output in the string line.
         s  - character string;
         c  - character.
 
-   Information, in the implementation is the appropriately type conversion
-specified in output records for clarity. For example, in case
-of consecutive "%%" will output one character "%".
+   Information, in the implementation is the appropriately type conversion specified in output records for clarity. For example, in case of consecutive "%%" will output one character "%".
 
 
 
@@ -46,9 +38,7 @@ of consecutive "%%" will output one character "%".
 
 	Description.
 
-	Function outputs to screen the message "Abnormal program termination"
-(abnormal program termination) and terminates execution with return code 1 or
-setting the signal handler 3.
+	Function outputs to screen the message "Abnormal program termination" (abnormal program termination) and terminates execution with return code 1 or setting the signal handler 3.
 
 
 	ABS
@@ -75,13 +65,7 @@ setting the signal handler 3.
 
 	Description.
 
-	Absolute read from disk. Function reads from disk one or
-several sectors starting with the specified sector relative offset. Sectors
-are numbered from 0 from the beginning of the disk (from physical!) disk. For example,
-the designated sector for the first physical disk, number 0, and then the first
-sector of FAT starts at sector 1, etc.
-Function returns 0 for successful completion of the operation. In case of error
-returns -1 (0FFh) and errno contains the error code.
+	Absolute read from disk. Function reads from disk one or several sectors starting with the specified sector relative offset. Sectors are numbered from 0 from the beginning of the disk (from physical!) disk. For example, the designated sector for the first physical disk, number 0, and then the first sector of FAT starts at sector 1, etc. Function returns 0 for successful completion of the operation. In case of error returns -1 (0FFh) and errno contains the error code.
 
 
 	ABSWRITE
@@ -97,13 +81,8 @@ returns -1 (0FFh) and errno contains the error code.
 
 	Description.
 
-	Absolute write to disk. Function writes to disk one or
-several sectors starting with the specified sector relative offset. Sectors
-are numbered from 0 from the beginning of the disk (from physical!) disk. For example,
-the designated sector for the first physical disk, number 0, and then the first
-sector of FAT starts at sector 1, etc.
-Function returns 0 for successful completion of the operation. In case of error
-returns -1 (0FFh) and errno contains the error code.
+	Absolute write to disk. Function writes to disk one or several sectors starting with the specified sector relative offset. Sectors are numbered from 0 from the beginning of the disk (from physical!) disk. For example, the designated sector for the first physical disk, number 0, and then the first sector of FAT starts at sector 1, etc.
+	Function returns 0 for successful completion of the operation. In case of error returns -1 (0FFh) and errno contains the error code.
 
 
 	ATEXIT
@@ -114,16 +93,7 @@ returns -1 (0FFh) and errno contains the error code.
 
 	Description.
 
-	Function registers (enters in its list) function *func as
-"exit function", i.e., processed before exit from the program. In case of normal
-program termination, exit calls (as parameters) "exit function"
-one by one before control transfer to the operating system. Multiple calls to atexit register
-various exit functions. Registered functions have no parameters. Up to 8 functions
-can be registered, which are executed in the order "last entered - first executed" (LIFO).
-Function atexit corresponds to the ANSI standard and to some implementations
-function onexit, if compatibility with ANSI is required.
-Function returns 0 if everything is correct and NULL if error
-(if already registered maximum number of exit-functions).
+	Function registers (enters in its list) function *func as "exit function", i.e., processed before exit from the program. In case of normal program termination, exit calls (as parameters) "exit function" one by one before control transfer to the operating system. Multiple calls to atexit register various exit functions. Registered functions have no parameters. Up to 8 functions can be registered, which are executed in the order "last entered - first executed" (LIFO). Function atexit corresponds to the ANSI standard and to some implementations function onexit, if compatibility with ANSI is required. Function returns 0 if everything is correct and NULL if error (if already registered maximum number of exit-functions).
 
 Example
          main()
@@ -148,16 +118,9 @@ Output:
 
 	Description.
 
-	Function converts a character string to integer value.
-Input string is represented as a sequence of characters, which may be
-white space characters or numeric characters designated by the type designation.
-Function performs reading of the input string, but only until
-the first character that cannot be recognized as a number (or the first
-character ending the string).
-Function returns a value of type int.
-Return value is 0 if input cannot be converted to
-value of integer type. In case of overflow, return value is
-undefined.
+	Function converts a character string to integer value. Input string is represented as a sequence of characters, which may be white space characters or numeric characters designated by the type designation. Function performs reading of the input string, but only until the first character that cannot be recognized as a number (or the first character ending the string).
+	Function returns a value of type int.
+	Return value is 0 if input cannot be converted to value of integer type. In case of overflow, return value is undefined.
 
 
 	BDOS
@@ -169,22 +132,9 @@ undefined.
 
 	Description.
 
-	Function executes system call whose number is specified
-in n. Parameters doshl and dosa correspond respectively to registers HL and A.
-Function executes call RST 10h for system call.
-Function can be used only for system calls that do not accept
-parameters or accept them only in registers HL and A.
-Function returns the value of register A, corresponding to the system call.
+	Function executes system call whose number is specified in n. Parameters doshl and dosa correspond respectively to registers HL and A. Function executes call RST 10h for system call. Function can be used only for system calls that do not accept parameters or accept them only in registers HL and A. Function returns the value of register A, corresponding to the system call.
 
-Note: For this function should be used only for system calls where
-error is indicated directly by setting a flag or register.
-I.e., in C-program cannot access this flag, unless return value
-is checked separately. In this case, should be used
-function intdos.
-Function bdosh differs from bdos only in that returns a value
-contained in register HL.
-These functions can be used for DOS calls: 02h, 0Ah, 0Bh, 0Eh, 11h, 1Bh,
-1Ch, 1Dh, 1Eh, 5Ch functions.
+	Note: For this function should be used only for system calls where error is indicated directly by setting a flag or register. I.e., in C-program cannot access this flag, unless return value is checked separately. In this case, should be used function intdos. Function bdosh differs from bdos only in that returns a value contained in register HL. These functions can be used for DOS calls: 02h, 0Ah, 0Bh, 0Eh, 11h, 1Bh, 1Ch, 1Dh, 1Eh, 5Ch functions.
 
 
 	BSEARCH
@@ -201,18 +151,13 @@ These functions can be used for DOS calls: 02h, 0Ah, 0Bh, 0Eh, 11h, 1Bh,
 
 	Description.
 
-	Function bsearch performs binary search in a sorted array.
-Parameter compare must point to a procedure provided by the user. During
-search, function bsearch may call this procedure several times, with each call passing
-a pointer to two array elements. Compare procedure must compare the elements, and then return
-one of the following int values:
+	Function bsearch performs binary search in a sorted array. Parameter compare must point to a procedure provided by the user. During search, function bsearch may call this procedure several times, with each call passing a pointer to two array elements. Compare procedure must compare the elements, and then return one of the following int values:
 
         < 0      element1 < element2
           0      element1 = element2
         > 0      element1 > element2
 
-Function bsearch returns a pointer to the first match of key in the array.
-Returns NULL if key is not found in array.
+Function bsearch returns a pointer to the first match of key in the array. Returns NULL if key is not found in array.
 
 
 	CALLOC
@@ -223,10 +168,7 @@ Returns NULL if key is not found in array.
 
 	Description.
 
-	Function allocates memory for array of n elements,
-each of size bytes. All allocated memory is initialized to 0.
-Function returns a pointer to the allocated memory.
-If allocation is unsuccessful, returns NULL value.
+	Function allocates memory for array of n elements, each of size bytes. All allocated memory is initialized to 0. Function returns a pointer to the allocated memory. If allocation is unsuccessful, returns NULL value.
 
 
 	CGETS
@@ -237,17 +179,7 @@ If allocation is unsuccessful, returns NULL value.
 
 	Description.
 
-	Function reads a string of characters from keyboard console, storing the string
-and its length in parameter str. Parameter str must be a pointer to a character array.
-The first element of array - str[0] must contain the maximum length
-(in characters) of the input string. The array must be sufficiently
-large to accommodate the string and terminating character. Function continues reading characters
-until it receives Enter key (0x0D) or maximum number of characters
-is reached. At the same time, the input string is not displayed on screen. The string is stored
-starting at str[2] of the array. At the same position in array str[1] is stored
-actual length of the string.
-Function returns a pointer to the beginning of the string, located in str[2].
-In case of error, return value is undefined.
+	Function reads a string of characters from keyboard console, storing the string and its length in parameter str. Parameter str must be a pointer to a character array. The first element of array - str[0] must contain the maximum length (in characters) of the input string. The array must be sufficiently large to accommodate the string and terminating character. Function continues reading characters until it receives Enter key (0x0D) or maximum number of characters is reached. At the same time, the input string is not displayed on screen. The string is stored starting at str[2] of the array. At the same position in array str[1] is stored actual length of the string. Function returns a pointer to the beginning of the string, located in str[2]. In case of error, return value is undefined.
 
 
 	CHDIR
@@ -258,12 +190,7 @@ In case of error, return value is undefined.
 
 	Description.
 
-	Function changes the current directory and current drive if
-they are specified in pathname. If the path begins with "\" - this means the path from the root
-directory, regardless of the current directory. Pathname must refer to existing
-directory.
-Function returns value 0 if the directory change was successful.
-On error, returns -1 (0FFh) and errno contains the error code.
+	Function changes the current directory and current drive if they are specified in pathname. If the path begins with "\" - this means the path from the root directory, regardless of the current directory. Pathname must refer to existing directory. Function returns value 0 if the directory change was successful. On error, returns -1 (0FFh) and errno contains the error code.
 
 
 	CLEARERR
@@ -274,12 +201,7 @@ On error, returns -1 (0FFh) and errno contains the error code.
 
 	Description.
 
-	Function clearerr relates to low-level input/output.
-Function clears in FILE structure of file the 4th bit "error flag"
-and 5th bit "end of file flag". Error flag is automatically
-set as follows: if an error occurs for a file, then subsequent
-operations on this file will return an error value until such time as
-the user calls function clearerr or rewind.
+	Function clearerr relates to low-level input/output. Function clears in FILE structure of file the 4th bit "error flag" and 5th bit "end of file flag". Error flag is automatically set as follows: if an error occurs for a file, then subsequent operations on this file will return an error value until such time as the user calls function clearerr or rewind.
 
 
 	CLRSCR
@@ -301,11 +223,7 @@ the user calls function clearerr or rewind.
 
 	Description.
 
-	Function outputs and converts according to format string of characters and values
-from keyboard console to screen. Other parameters specify values and types, which
-correspond to the types, designated in the format string.
-Function returns the number of displayed characters. In case of error on output, function
-returns a negative value.
+	Function outputs and converts according to format string of characters and values from keyboard console to screen. Other parameters specify values and types, which correspond to the types, designated in the format string. Function returns the number of displayed characters. In case of error on output, function returns a negative value.
 
 
 	CPUTS
@@ -329,17 +247,10 @@ must be terminated with null.
 
 	Description.
 
-	Function is low-level input/output.
-Function creat creates a new file. If the file already exists, it is
-truncated to zero length. The value of attr consists of several constants:
-S_IWRITE and S_IREAD, defined in "stat.h". If you need to set multiple flags,
-combine them using logical OR "|".
-Function returns a file descriptor.
-On error, returns value -1 (0FFFFh) and errno contains the error code.
+	Function is low-level input/output. Function creat creates a new file. If the file already exists, it is truncated to zero length. The value of attr consists of several constants:
+	S_IWRITE and S_IREAD, defined in "stat.h". If you need to set multiple flags, combine them using logical OR "|". Function returns a file descriptor. On error, returns value -1 (0FFFFh) and errno contains the error code.
 
-Function returns the file descriptor if Ok.
-On error, returns value -1 (0FFFFh) and global errno contains
-the error code.
+	Function returns the file descriptor if Ok. On error, returns value -1 (0FFFFh) and global errno contains the error code.
 
 
 	DEC8
@@ -350,9 +261,7 @@ the error code.
 
 	Description.
 
-	Function outputs parameter value in decimal format with output to
-screen. The output value range is 0..255. Function does not return any
-value.
+	Function outputs parameter value in decimal format with output to screen. The output value range is 0..255. Function does not return any value.
 
 
 	DEC16
@@ -363,9 +272,7 @@ value.
 
 	Description.
 
-	Function outputs parameter value in decimal format with output to
-screen. The output value range is 0..65535. Function does not return any
-value.
+	Function outputs parameter value in decimal format with output to screen. The output value range is 0..65535. Function does not return any value.
 
 
 	DEC32
@@ -376,10 +283,7 @@ value.
 
 	Description.
 
-	Function outputs two 16-bit parameters high (high byte) and
-low (low byte) as one value. Output is performed in decimal format
-with output to screen. The output value range is 0...4 billion.
-Function does not return any value.
+	Function outputs two 16-bit parameters high (high byte) and low (low byte) as one value. Output is performed in decimal format with output to screen. The output value range is 0...4 billion. Function does not return any value.
 
 
         DISABLE
@@ -396,5 +300,182 @@ Function does not return any value.
 	DIV
 
 	#include <stdlib.h>
-[...]
 
+	struct divt *div(uint num1, uint num2)
+
+	Description.
+
+	The function divides num1 by num2, returning the quotient and remainder. Returns a structure of type div_t, defined in <stdlib.h>.
+
+
+	ENABLE
+
+	#include <dos.h>
+
+	void enable()
+
+	Description.
+
+	The function enables interrupts.
+
+
+	_EXIT
+
+	#include <stdlib.h>
+
+	void _exit(int code)
+
+	Description.
+
+	The function terminates the calling process without flushing stream buffers. The value code is typically set to 0 to indicate a normal exit and set to any other value to indicate an error. Since _exit does not return a value, the low byte of code serves as the exit code for the parent process.
+
+
+EXIT
+
+	#include <stdlib.h>
+
+	void exit(int code)
+
+	Description.
+
+	The function terminates the calling process. Before terminating the process, the function flushes all buffers to files and closes all open files. Before exiting to the operating system, the function previously calls all registered "exit function" functions (which are called before exit in reverse order of registration). The value code is typically set to 0 to indicate a normal exit and set to any other value to indicate an error. Since exit does not return a value, the low byte of code serves as the exit code for the parent process.
+
+
+FCLOSE
+
+	#include <stdio.h>
+
+	char fclose(FILE *fp)
+
+	Description.
+
+	The function refers to high-level input/output functions. The function flushes the buffer to file and closes it. This function can only close files that work with buffers in the framework of high-level input/output. To close files in the framework of low-level input/output, you need to use the close function.
+	The function returns 0 upon successful completion. On error, it returns the value -1 (0FFh) and errno contains the error code.
+
+
+FCLOSALL
+
+	#include <stdio.h>
+
+	void fclosall()
+
+	Description.
+
+	The function refers to high-level input/output functions. The function flushes all buffers to files and closes all open files.
+
+
+FDOPEN
+
+	#include <stdio.h>
+
+	FILE *fdopen(FD fd, char *mode)
+
+Description.
+
+The function opens a file opened for low-level input/output to be buffered
+and formatted, i.e., converts it for high-level input/output. After this, for
+all subsequent operations with the file, it is necessary to use high-level
+input/output functions. Consequently, close the file with the fclose function,
+not close. The symbolic string mode defines the type of access to the file:
+
+      r,w,a          -  text file mode
+      rb,wb,ab       -  binary file mode
+      r+, w+, a+     -  r/w, "on update" text file mode
+      r+b, w+b, a+b  -  r/w, "on update" binary file mode
+
+In addition to the above values, you can add the character "b" or "t" to set
+the mode of line ending translation. The "t" option does not apply to the ANSI
+standard for fopen. This is Microsoft's extension and should not be used if
+ANSI compatibility is required.
+If "b" or "t" is not specified in the "mode" string, the line ending mode is
+determined as "t".
+The function returns a pointer to the open FILE structure. On error, it returns
+NULL.
+
+
+FFIRST, _FFIRST
+
+	#include <dos.h>
+
+	char _ffirst(char *pathname, FIND *ffblk, char attr)
+	char ffirst(char *pathname, FIND *ffblk, char attr)
+
+Description.
+
+The function ffirst searches for a file specified in pathname from a group of
+files. The pathname argument may contain a disk name and directory for searching.
+In the file name, wildcard characters ? and * are allowed. The name of the found
+file is in DOS "filename.ext" format.
+The function _ffirst differs from ffirst in that it returns the name of the found
+file in the "FilenameExt" format.
+If a file is found, the function fills a structure (defined in "dos.h") that is
+pointed to by the ffblk argument.
+The attr argument contains the attribute(s) of files to search and may take the
+following values defined in "dos.h":
+
+	FA_NORMAL	Regular file
+	FA_RDONLY	Read-only
+	FA_HIDDEN	Hidden file
+	FA_SYSTEM	System file
+	FA_LABEL	Volume label
+	FA_DIREC	Directory
+	FA_ARCH		Archive
+
+You can set multiple values of attributes using the "|" symbol (OR operator).
+The function returns 0 upon successful search completion.
+If the file is not found or an error occurred in the file name, it returns -1
+and errno contains the error code.
+
+
+FFLUSH
+
+	#include <stdio.h>
+
+	char fflush(FILE *fp)
+
+Description.
+
+The function refers to high-level input/output functions.
+The function releases (writes) the buffer of an open file. It is used for
+preserving data on disk before an operation that could block the system.
+If the file is open for writing, the buffer is written to the file. If the file
+is open for reading, the buffer is cleared. After calling the function, the file
+remains open. The function returns 0 if the buffer has been successfully updated.
+The same value is returned when the stream has no buffer or when it is open only
+for reading. In case of an error, the value EOF is returned.
+
+
+FGETC
+
+	#include <stdio.h>
+
+	char fgetc(FILE *fp)
+
+Description.
+
+The function refers to high-level input/output functions.
+The function reads the current character from the stream fp and sets the pointer
+(if it exists) to the next character. The read character is returned.
+In case of an error or reaching the end of the file, the value EOF is returned.
+However, the value EOF can be perceived as an integer, in which case you need
+to use the ferror and feof functions to check for error or end of file.
+
+
+FGETPOS
+
+	#include <stdio.h>
+
+	char fgetpos(FILE *fp, fpos_t *position)
+
+Description.
+
+The function refers to high-level input/output functions.
+The function saves the current position of the file pointer in an object to
+which position points. Later, the fsetpos function uses the value saved in
+position to restore the file pointer to a new position. The value of position
+is stored in internal format and should only be used with the fgetpos and
+fsetpos functions.
+The function returns 0. On error, it returns -1.
+
+
+FGETS
